@@ -1,0 +1,243 @@
+%=================================================================================
+% PACKAGES
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{wasysym} % for circles
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+%\usepackage[usenames,dvipsnames]{color}
+\usepackage{textcomp}
+\usepackage{alltt}
+\usepackage{subfigure}
+\usepackage{latexsym}
+\usepackage{eurosym}
+\usepackage{verbatim}
+\usepackage{epstopdf}         % if you want to use .eps and .jpeg in the same document (compile with pdflatex directly)
+\usepackage{array}            % permet d'utiliser m{width} dans l'env tabular
+\usepackage[english]{babel}
+\usepackage{multirow}
+\usepackage{algorithmic}
+\usepackage{units}
+\usepackage{nicefrac}
+\usepackage{natbib} 
+\usepackage{appendix}
+%\usepackage{chapterbib}
+\usepackage{booktabs}
+\usepackage{pdfpages}        % to include pdf pages into the doc \includepdf[pages={1}]{myfile.pdf}
+\usepackage{layout}          % then \layout in the document to get the layout numbers
+\usepackage{hyperref}        % Hyper references for the document
+\hypersetup{
+  colorlinks=true,       % false: boxed links; true: colored links
+  breaklinks=true,    % permet le retour à la ligne dans les liens trop longs
+  linkcolor=black,       % color of internal links (red)
+  citecolor=black,       % color of links to bibliography (green)
+  filecolor=black,       % color of file links (magenta)
+  urlcolor=black,        % color of external links (cyan)
+  pdftitle={\FileTitle},
+  pdfauthor={\FileAuthor},
+  pdfsubject={\FileSubject},
+  pdfkeywords={\FileKeyWords}}
+
+% BEAMER specific
+\mode<article>{\usepackage{fullpage}}
+\mode<presentation>
+{
+  \usetheme{default}
+  \usecolortheme{default} % beetle, lily, beaver
+}
+\usepackage{tikz}
+\usepackage{mdwlist}
+\usepackage{moreverb}
+\usepackage{etex}   % this is a dodgy fix for using lpic: http://www.tex.ac.uk/cgi-bin/texfaq2html?label=noroom
+\usepackage{lpic}
+\usepackage[absolute,overlay]{textpos} % for absolute positioning on page
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{\leavevmode% 
+  \hfill\hbox{% 
+    \begin{beamercolorbox}[wd=1.0\paperwidth,ht=2.25ex,dp=1ex,left]{date in head/foot}% 
+      \scriptsize \hspace*{1ex} \insertframenumber{} %
+    \end{beamercolorbox}}% 
+  \vskip0pt%
+}
+\beamertemplatetransparentcovereddynamic
+\beamertemplateballitem
+\beamertemplatesolidbuttons
+\usefonttheme[onlymath]{serif}
+\setbeamercovered{invisible} % http://tex.stackexchange.com/questions/53860/can-i-tell-beamer-that-uncover-should-be-invisible-not-merely-grayed-out
+
+
+%=================================================================================
+% Useful commands
+\newcommand{\minimum}[1]{\mathop{\textrm{min}}_{#1}\,}
+\newcommand{\maximum}[1]{\mathop{\textrm{max}}_{#1}\,}
+\newcommand{\argmin}[1]{\mathop{\textrm{arg min}}_{#1}\,}
+\newcommand{\dg}{\textsc{dg}}
+\newcommand{\bs}{\boldsymbol}
+\newcommand{\mbf}[1]{\mathbf{#1}}
+\newcommand{\com}[1]{\textcolor{red}{#1}\marginpar{\textcolor{red}{\Large $/!\backslash$}}}
+\newcommand{\pfrac}[2]{\frac{\partial#1}{\partial#2}}
+\newcommand{\dpfrac}[2]{\dfrac{\partial#1}{\partial#2}}
+\newcommand{\ufrac}[2]{\frac{\ud{}#1}{\ud{}#2}}
+\newcommand{\dufrac}[2]{\dfrac{\ud{}#1}{\ud{}#2}}
+\newcommand{\wt}[1]{\widetilde{#1}}
+\newcommand{\avg}[1]{\left\{\!\!\left\{#1\right\}\!\!\right\}}
+\newcommand{\jmp}[1]{\left[\!\left[#1\right]\!\right]}
+\newcommand{\hr}{\textsc{hr}}
+\newcommand{\xjl}{x_{j-\nicefrac{1}{2}}}
+\newcommand{\xjr}{x_{j+\nicefrac{1}{2}}}
+\newcommand{\xRl}{x_{I-\nicefrac{1}{2}}}
+\newcommand{\xRr}{x_{I+\nicefrac{1}{2}}}
+\newcommand{\xLl}{x_{(I-1)-\nicefrac{1}{2}}}
+\newcommand{\xLr}{x_{(I-1)+\nicefrac{1}{2}}}
+\newcommand{\ud}{\,\mathrm{d}}
+\newcommand{\dgm}{\textsc{dgm}}
+\newcommand{\fem}{\textsc{fem}}
+\newcommand{\fvm}{\textsc{fvm}}
+\newcommand{\cpu}{\textsc{cpu}}
+\newcommand{\gpu}{\textsc{gpu}}
+\newcommand{\gpub}{\textsc{gpublas}}
+\newcommand{\blas}{\textsc{blas}}
+\newcommand{\cublas}{\textsc{cublas}}
+\newcommand{\cuda}{\textsc{cuda}}
+\newcommand{\pcpu}{$P_{\cpu{}}$}
+\newcommand{\pgpu}{$P_{\gpu{}}$}
+\newcommand{\pgpub}{$P_{\gpub{}}$}
+\newcommand{\pcpuc}{\textcolor{red}{$P_{\cpu{}}$}}
+\newcommand{\pgpuc}{\textcolor{olivegreen}{$P_{\gpu{}}$}}
+\newcommand{\pgpubc}{\textcolor{blue}{$P_{\gpub{}}$}}
+\newcommand{\bth}{$B_{\text{theo}}$}
+\newcommand{\bpr}{$B_{\text{pract}}$}
+\newcommand{\bcpu}{$B_{\text{\cpu{}}}$}
+\newcommand{\bgpu}{$B_{\text{\gpu{}}}$}
+\newcommand{\bgpub}{$B_{\text{\gpub{}}}$}
+\newcommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+\newcommand{\tabcn}[1]{\multicolumn{1}{c}{\makebox[0.65cm]{\tiny #1}}} % for a tabular workaround
+\renewcommand*{\thesubfigure}{}  % Gets rid of the subfigure counter!!
+\newcommand{\alf}{Alfvén}
+\newcommand{\els}{Elsässer}
+% Needed for the title page:
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+% Needed for the natbib bibliography style
+%\newcommand*{\newblock}{}
+%% \bibpunct[<optional>]{}{}{;}{}{}{} 
+% To put a box around a figure
+\setlength\fboxsep{0pt}
+\setlength\fboxrule{0.5pt}
+\def\CC{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\tiny\bf ++}}}
+
+% increase space in underbrace env (http://tex.stackexchange.com/questions/13843/vertical-spacing-with-underbrace-command)
+\newcommand*\mystrut[1]{\vrule width0pt height0pt depth#1\relax}
+
+%=================================================================================
+% Define some colors
+\definecolor{violetred}{rgb}{0.78,0.08,0.52}
+\definecolor{olivegreen}{rgb}{0.2,0.6,0.0}
+\definecolor{darkgray}{rgb}{0.95,0.95,0.95}
+\definecolor{mypurple}{rgb}{0.76,0.06,0.76}
+\definecolor{greenyellow}{rgb}{0.76,0.76,0.06}
+\definecolor{gold}{HTML}{FFD700} 
+\definecolor{IMnumber}{HTML}{AFB9DB}
+
+% From http://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&ved=0CFcQFjAA&url=http%3A%2F%2Fwww.perceptualedge.com%2Farticles%2Fvisual_business_intelligence%2Frules_for_using_color.pdf&ei=TioYUPL8GMPl0QHhqICQAQ&usg=AFQjCNGA9t1pGae49wQ0DVhaSNcAk6oLyA&sig2=QuA9D9nierTbqn3djCyyPQ
+\definecolor{c1med}{HTML}{F15A60} % red
+\definecolor{c2med}{HTML}{7AC36A} % green
+\definecolor{c3med}{HTML}{5A9BD4} % blue
+\definecolor{c4med}{HTML}{FAA75B} % orange
+\definecolor{c5med}{HTML}{9E67AB} % purple
+\definecolor{c6med}{HTML}{CE7058} % burgundy
+\definecolor{c7med}{HTML}{D77FB4} % magenta
+\definecolor{c8med}{HTML}{737373} % grey
+
+\definecolor{c1brt}{HTML}{EE2E2F} % red     
+\definecolor{c2brt}{HTML}{008C48} % green   
+\definecolor{c3brt}{HTML}{185AA9} % blue    
+\definecolor{c4brt}{HTML}{F47D23} % orange  
+\definecolor{c5brt}{HTML}{662C91} % purple  
+\definecolor{c6brt}{HTML}{A21D21} % burgundy
+\definecolor{c7brt}{HTML}{B43894} % magenta 
+\definecolor{c8brt}{HTML}{010202} % black
+
+\newcommand{\tcb}[2]{\textcolor{c#1brt}{#2}}
+\newcommand{\tcm}[2]{\textcolor{c#1med}{#2}}
+
+%=================================================================================
+% Tikz special stuff (do after color definitions)
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{calc}
+\usetikzlibrary{decorations.shapes}
+\usetikzlibrary{decorations.pathmorphing}
+\tikzset{paint/.style={fill=red}, decorate with/.style={decorate,decoration={shape backgrounds,shape=#1,shape size=3pt}}}
+\tikzset{dotr/.style={fill=c1brt,circle,minimum size=3pt}}
+\tikzset{dotb/.style={fill=c3brt,circle,minimum size=3pt}}
+\tikzset{dotrr/.style={fill=c1brt,circle,minimum size=0.2cm,inner sep=0}}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes}
+\usetikzlibrary{snakes}
+%fill=red,circle,minimum size=3pt
+\usepackage{pgfkeys}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+
+%=================================================================================
+% Environments 
+% Theorem environments (from http://www.math.uiuc.edu/~hildebr/tex/theorems.html)
+\newtheorem{thm}{Théorème}[section]
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+%\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remark}
+%\theoremstyle{definition}
+%\newtheorem{def}[thm]{Definition}
+
+% Tight lists
+\newenvironment{tight-itemize}
+{\begin{itemize}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}}
+{\end{itemize}}
+\newenvironment{tight-enumerate}
+{\begin{enumerate}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}}
+{\end{enumerate}}
+\newenvironment{tight-description}
+{\begin{description}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}}
+{\end{description}}
+
+%=================================================================================
+% For code inclusion
+\usepackage{listings}
+\lstset{
+language=c,                        % choose the language of the code
+basicstyle=\tiny,                  % the size of the fonts that are used for the code
+backgroundcolor=\color{white}, %\color{darkgray},  % choose the background color. You must add \usepackage{color}
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+frame=none,                     % adds a frame around the code
+tabsize=1,                      % sets default tabsize to 4 spaces
+captionpos=t,                   % sets the caption-position to bottom
+breaklines=true,                % sets automatic line breaking
+numbers=none,                   % where to put the line-numbers
+numberstyle=\tiny,              % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it's 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+keywordstyle=\color[rgb]{0,0,1},
+commentstyle=\color[rgb]{0.133,0.545,0.133},
+stringstyle=\color[rgb]{0.627,0.126,0.941},
+morekeywords={scalar,dim3, end}      % if you want to add more keywords to the set
+}
+
+%=================================================================================
+% For media inclusion
+%\usepackage{movie15}
+%\usepackage{media9}
+\usepackage{multimedia}

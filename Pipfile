@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+scikit-learn = "*"
+torch = "*"
+tensorboardx = "*"
+tensorflow = "*"
+ipython = "*"
+scipy = "*"
+imbalanced-learn = "*"
+torchvision = "*"
+yt = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"

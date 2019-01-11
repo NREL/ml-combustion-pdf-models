@@ -1,0 +1,1149 @@
+\documentclass[review]{elsarticle}
+
+\usepackage{amsmath}
+\usepackage{lineno,hyperref}
+\modulolinenumbers[5]
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{font=small}
+\captionsetup[sub]{font=footnotesize}
+\usepackage{nicefrac}
+\usepackage{booktabs}
+\usepackage[usenames]{xcolor}
+\usepackage{units}
+\usepackage[acronyms]{glossaries}
+
+\journal{Combustion and Flame}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Elsevier bibliography styles
+%%%%%%%%%%%%%%%%%%%%%%%
+%% To change the style, put a % in front of the second line of the current style and
+%% remove the % from the second line of the style you would like to use.
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Numbered
+%\bibliographystyle{model1-num-names}
+
+%% Numbered without titles
+%\bibliographystyle{model1a-num-names}
+
+%% Harvard
+%\bibliographystyle{model2-names.bst}\biboptions{authoryear}
+
+%% Vancouver numbered
+%\usepackage{numcompress}\bibliographystyle{model3-num-names}
+
+%% Vancouver name/year
+%\usepackage{numcompress}\bibliographystyle{model4-names}\biboptions{authoryear}
+
+%% APA style
+%\bibliographystyle{model5-names}\biboptions{authoryear}
+
+%% AMA style
+%\usepackage{numcompress}\bibliographystyle{model6-num-names}
+
+%% `Elsevier LaTeX' style
+%\bibliographystyle{elsarticle-num}
+\bibliographystyle{elsarticle-num-names}
+\makeatletter
+\providecommand{\doi}[1]{%
+  \begingroup
+  \let\bibinfo\@secondoftwo
+  \urlstyle{rm}%
+  \href{http://dx.doi.org/#1}{%
+    doi:\discretionary{}{}{}%
+    \nolinkurl{#1}%
+  }%
+  \endgroup
+}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%=================================================================================
+% Useful commands
+\newcommand{\ud}{\,\mathrm{d}}
+\newcommand{\pfrac}[2]{\frac{\partial#1}{\partial#2}}
+\newcommand{\dpfrac}[2]{\dfrac{\partial#1}{\partial#2}}
+\newcommand{\ufrac}[2]{\frac{\ud{}#1}{\ud{}#2}}
+\newcommand{\dufrac}[2]{\dfrac{\ud{}#1}{\ud{}#2}}
+\newcommand{\wt}[1]{\widetilde{#1}}
+\newcommand{\ol}[1]{\overline{#1}}
+
+%=================================================================================
+% Abbreviations
+\newacronym{dns}{DNS}{direct numerical simulation}
+\newacronym{les}{LES}{large eddy simulations}
+\newacronym{pdf}{PDF}{probability density function}
+\newacronym{pmf}{PMF}{probability mass function}
+\newacronym{ml}{ML}{machine learning}
+\newacronym{dnn}{DNN}{deep neural network}
+\newacronym{vae}{VAE}{variational auto-encoder}
+\newacronym{cvae}{CVAE}{conditional variational autoencoder}
+\newacronym{gan}{GAN}{generative adversarial network}
+\newacronym{fgm}{FGM}{flamelet-generated manifolds}
+\newacronym{dof}{DoFs}{degrees of freedom}
+\newacronym{rmse}{RMSE}{root mean square error}
+\makeglossaries
+\glsdisablehyper
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Deep learning for presumed probability density function models}
+%\tnotetext[mytitlenote]{Fully documented templates are available in the elsarticle package on \href{http://www.ctan.org/tex-archive/macros/latex/contrib/elsarticle}{CTAN}.}
+
+\author[main]{M.~T.~Henry de Frahan\corref{cor1}}
+\ead{marc.henrydefrahan@nrel.gov}
+
+\author[main]{S.~Yellapantula}
+
+\author[main2]{R.~King}
+
+\author[lbnl]{M.~S.~Day}
+
+\author[main]{R.~W.~Grout}
+\ead{ray.grout@nrel.gov}
+
+\cortext[cor1]{Corresponding author}
+
+\address[main]{High Performance Algorithms and Complex Fluids, Computational Science Center, National Renewable Energy Laboratory, 15013 Denver W Pkwy, ESIF301, Golden, CO 80401, USA}
+\address[main2]{Complex Systems Simulation and Optimization Group, Computational Science Center, National Renewable Energy Laboratory, 15013 Denver W Pkwy, ESIF301, Golden, CO 80401, USA}
+\address[lbnl]{Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory, Berkeley, CA 94720, USA}
+
+\begin{abstract}
+  In this work, we use \gls{ml} techniques to develop presumed
+  \gls{pdf} models for \acrlong{les} of reacting flows. The joint
+  sub-filter \gls{pdf} of mixture fraction and progress variable is
+  modeled using various \gls{ml} algorithms and commonly used
+  analytical models. The \gls{ml} algorithms evaluated in the work are
+  representative of three major classes of \gls{ml} techniques:
+  traditional ensemble methods (random forests), deep learning
+  (\acrlong{dnn}s), and generative learning (\gls{cvae}). The
+  first two algorithms are supervised learning algorithms, and the
+  third is an unsupervised learning algorithm. Data from \acrlong{dns}
+  of the low-swirl burner~\cite{Day2012} are used to develop training
+  data for sub-filter \gls{pdf} models. Models are evaluated on
+  predictions of the sub-filter \glspl{pdf} as well as predictions of
+  the filtered reaction rate of the progress variable, computed
+  through a convolution of the sub-filter \gls{pdf} and the
+  conditional means of the reaction rate. This a-priori modeling study
+  demonstrates that deep learning models for presumed \gls{pdf}
+  modeling are three times more accurate than analytical
+  $\beta$-$\beta$ \gls{pdf} models. These models are as accurate as
+  random forest models while using five times fewer trainable
+  parameters and being 25 times faster for inference. We illustrate
+  how models generalize to other regions of the flow and develop
+  criteria based on the Jensen-Shannon divergence to quantify the
+  performance of a model on new data.
+\end{abstract}
+
+\begin{keyword}
+  large eddy simulation \sep presumed probability density function \sep low-swirl burner \sep machine learning \sep $\beta$-$\beta$ PDF
+\end{keyword}
+
+\end{frontmatter}
+
+\glsresetall
+
+%\linenumbers
+
+\section{Introduction}
+Simulation has the potential to accelerate the development of
+cost-effective combustion technologies. Even with modern
+high-performance computing hardware however, the computational cost of
+fully resolving the reacting flows in these devices can be
+prohibitive. \Gls{les} reduce the computational burden of simulating
+turbulent reacting flows. \Gls{les} work with spatially filtered state
+variables, which exhibit considerably less temporal and spatial
+structure and thus require much less numerical resolution. However,
+physical processes occurring at scales smaller than the filter width
+must then be approximated with ``closure models,'' which of course
+then determine the accuracy of the approach. \Gls{les} closure models
+for nonreacting flows have received a great deal of recent attention,
+and they are now in standard use for a wide range of engineering
+applications. For reacting flows, considerable complexity arises from
+the necessity to incorporate additional fine scales because of
+chemical processes and chemistry-turbulence interactions. One approach
+to constructing sub-filter \gls{les} models for reacting flows is to
+express modeled quantities as convolutions between the physical state
+and a \gls{pdf}. A presumed \gls{pdf} approach posits a class of
+parameterized functional shapes for such \glspl{pdf}, and thus it defines
+a parameterized model based on the resulting convolution integrals. In
+some of the earliest work in this area, \citet{Cook1994} proposed the
+use of $\beta$ functions for the \gls{pdf} shape; much of the work in
+the field since then has followed this basic
+strategy. \citet{Jimenez1997} provided further analysis to justify the
+appropriateness of the $\beta$ \gls{pdf} for passive scalar
+mixing. \citet{Ihme2008, Ihme2008a} determined that the
+``statistically most likely distribution'' was most appropriate
+for a reacting scalar case.
+
+The objective of the work presented here is to expand on the presumed
+$\beta$ approach, with specific focus on the case of
+reacting scalars. We incorporate a variety of \gls{ml} algorithms to
+explore the accuracy of a number of \gls{pdf} shape functionals for
+their use with an \gls{les} model, and we judge them by their ability to
+reproduce a large-scale, \gls{dns} data set for a specific reacting flow
+configuration. We explore three major classes of \gls{ml} algorithms
+for use in this context: traditional ensemble methods (random
+forests); deep learning (deep neutral network); and deep, generative,
+unsupervised learning (conditional variable autoencoder). More
+broadly, traditional \gls{ml} methods include techniques such as
+linear and polynomial regression, k-nearest neighbors, support vector
+machines, Gaussian processes, and random forests. Of these, we focus
+only on the latter because they have demonstrated widespread success for
+complex modeling
+applications~\cite{Fernandez-Delgado2014,Liaw2002}. Random forests are
+based on an ensemble of decision trees, where decisions are based on
+the model parameters to provide estimates of the
+target. \Glspl{dnn} are universal function
+approximators~\cite{Cybenko1989,Hornik1991} based on a sequence of
+learnable linear operators and activation functions that are tuned
+using a gradient-descent optimizer. \Glspl{dnn} have received much
+attention in recent years, in large part because of the availability of large
+public training data sets and powerful computing platforms such as
+graphics processing units (GPUs)~\cite{Goodfellow2016}. Additional
+advances in deep learning, particularly in the types of neutral
+network architectures, have led to breakthroughs in generative and
+unsupervised learning, where new data are generated using the models
+with unlabeled data and then by identifying trends and commonalities in
+the generated data. \Glspl{vae} leverage neutral networks to encode
+information from input data into a latent space, which can then be
+sampled through a decoder to generate new distributions that are
+similar to the original data set.
+
+In this work, we use the three \gls{ml} approaches discussed here
+to construct presumed \gls{pdf} models for a \gls{dns} data set
+that is a snapshot of a quasi-stationary simulation of a low-swirl,
+premixed methane-air burner~\cite{Day2012}. We then evaluate the
+suitability of the different classes of \gls{ml} algorithms, and of
+the presumed \gls{pdf} model itself, both for data from a subregion of
+the \gls{dns} and for the entire simulation
+domain. In Section\,\ref{sec:formulation}, we formulate the target
+problem and methods, including the details of the presumed \gls{pdf}
+approach, the \gls{dns} target data, and the \gls{ml} algorithms and
+network architectures explored. In Section\,\ref{sec:results}, we
+compare the \gls{ml}-based constructions to simple analytic models.
+
+\section{Formulation}\label{sec:formulation}
+
+\subsection{Presumed \acrlong{pdf} modeling for combustion}\label{sec:physics}
+
+In \gls{les} of reacting flows using presumed forms of \glspl{pdf}, an
+important unclosed term in the equations is the filtered reaction
+rates, appearing as a source term in the transport equation for
+species mass fractions or progress
+variables~\cite{Veynante2002,Pitsch2006a}. A common approach to
+modeling the filtered reaction rates is to express it as a convolution
+of a reaction rate derived from a physical model and a \gls{pdf}. The
+conditioning variables are typically chosen to correlate strongly with
+mixing (mixture fraction) and flame propagation (progress variable)
+space, accounting for much of the subgrid variation about the
+mean. The conditional rate can then be modeled through a variety of
+approaches to identify the manifold, such as canonical calculations
+and tabulation (e.g., \acrlong{fgm}~\cite{VanOijen2002}, flame
+prolongation of intrinsic low dimensional
+manifold~\cite{Gicquel2000}), solving conditional transport equations
+(e.g., conditional moment closure~\cite{Klimenko1999}), or estimated
+on the fly using conditional source term
+estimation~\cite{JinGB08}. Once the conditional rate is obtained,
+through whatever means, the unconditional mean that appears in the
+source term for the transport equations can be recovered by weighting
+with the distribution and integrating over the conditioning space:
+\begin{align}\label{eq:convolution}
+  \wt{\dot{\omega}} = \int \langle \dot{\omega} | Z, c \rangle P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''}) \ud Z \ud c.
+\end{align}
+Here, $\langle \cdot \rangle$ denotes the volumetric mean of a
+quantity; $\wt{\cdot} = \nicefrac{\ol{\rho~\cdot}}{\ol{\rho}}$ denotes
+the Favre filter; $\ol{\cdot}$ denotes the \gls{les} filter; $Z$ is
+the mixture fraction, capturing the mixing of fuel and oxidizer; $c$
+is the progress variable, capturing the overall reaction progress;
+$\dot{\omega}$ is the reaction rate of the progress variable (units of
+$\unitfrac{1}{s}$, omitted for brevity); $Z'' = (Z-\wt{Z})^2$ is the
+mixture fraction variance; $c'' = (c - \wt{c})^2$ is the progress
+variable variance; and $P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})$
+is the density-weighted \gls{pdf} of $Z$ and $c$, conditioned on
+$\wt{Z}$, $\wt{Z''}$, $\wt{c}$, and $\wt{c''}$. The objective of this
+work is to develop accurate models of this \gls{pdf} using \gls{ml}
+techniques. Current analytical models often rely on using a $\beta$
+\gls{pdf}~\cite{Cook1994}, defined as:
+\begin{align}
+  \label{eq:beta}
+  \beta(x; a, b) = \frac{\Gamma(a + b)}{\Gamma(a)\Gamma(b)} x^{a-1} (1-x)^{b-1},
+\end{align}
+where $\Gamma(\cdot)$ is the gamma function; $a$ and $b$ are the
+$\beta$ \gls{pdf} parameters, which can be related to the mean, $\mu$, and
+variance, $\sigma^2$, as
+$a=\mu \left( \frac{\mu (1-\mu)}{\sigma^2} - 1\right)$, and
+$b=(1-\mu) \left( \frac{\mu (1-\mu)}{\sigma^2} - 1\right)$. In this
+work, $\wt{Z}$ and $\wt{Z''}$ are used as the mean and variance for a
+$\beta$ \gls{pdf} in the mixture fraction space, and $\wt{c}$ and $\wt{c''}$
+form the $\beta$ \gls{pdf} in the progress variable space, such that
+$P(Z,c) = \beta(Z; a_{\wt{Z}}, b_{\wt{Z}}) \beta(c; a_{\wt{c}},
+b_{\wt{c}})$. This model will be used for comparisons with data-driven
+models using different \gls{ml} techniques.
+
+\subsection{Description of the \acrlong{dns} of the low-swirl burner}\label{sec:dns}
+The \gls{dns} of an experimental lean premixed turbulent low-swirl
+methane flame provide the data for model
+development~\cite{Day2012,Cheng2000}. In this configuration, a nozzle
+imposes a low swirl (geometric swirl number of 0.55) to a CH$_4$ and
+air mixture with a fuel-air equivalence ratio of 0.7 at the inflow. A
+co-flow of cold air surrounds the nozzle region with an upward
+velocity of $0.25\,\unitfrac{m}{s}$. The inflow velocity of the
+fuel-air mixture at the nozzle is $15\,\unitfrac{m}{s}$. The laminar
+flame thickness is $600\,\unit{\mu m}$. The simulation was performed
+using LMC, a low Mach number Navier-Stokes solver for turbulent
+reacting flows that leverages adaptive mesh refinement to resolve
+finer scales~\cite{Day2000}. Three levels of refinement were used,
+leading to effective resolution of $100\,\unit{\mu m}$ in the flame
+region. The computational domain was $0.25\,\unit{m}$ in each
+dimension. The DRM 19 chemical mechanism was used to model the finite
+rate kinetics~\cite{Kazakov1994}. The domain pressure is
+$1\,\unit{atm}$. The mixture fraction, $Z$, is computed through a linear
+combination of the nitrogen mass fraction in the burner exit stream
+and the co-flow and it is normalized such that it varies between 0 in the
+co-flow stream and 1 in the burner exit stream. The progress variable
+is computed as $c= Y_{CO_2} + Y_{CO} + Y_{H_2} + Y_{H_2O}$ and varies
+between 0 and 0.21, where $Y_i$ is the mass fraction of species $i$, 
+$\sum^{N_s}_{i=1} Y_i = 1$, and $N_s$ is the number of species.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth]{./figs/src_pv.pdf}%
+    \caption{$x=0\,\unit{m}$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=2,width=\textwidth]{./figs/src_pv.pdf}%
+    \caption{$z=0.0525\,\unit{m}$ (center height of $\mathcal{V}_{1}$).}%
+  \end{subfigure}\\%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=3,width=\textwidth]{./figs/src_pv.pdf}%
+    \caption{$z=0.0775\,\unit{m}$ (center height of $\mathcal{V}_{3}$).}%
+ \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=4,width=\textwidth]{./figs/src_pv.pdf}%
+    \caption{$z=0.1025\,\unit{m}$ (center height of $\mathcal{V}_{5}$).}%
+  \end{subfigure}\\%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=5,width=\textwidth]{./figs/src_pv.pdf}%
+    \caption{$z=0.1275\,\unit{m}$ (center height of $\mathcal{V}_{7}$).}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=6,width=\textwidth]{./figs/src_pv.pdf}%
+    \caption{$z=0.14\,\unit{m}$ (center height of $\mathcal{V}_{9}$).}%
+  \end{subfigure}
+  \caption{Slices of $\dot{\omega}$ in \gls{dns}. White dashed lines: $z$ locations of slices shown in (b)--(f).}\label{fig:dns}%
+\end{figure}%
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth]{./figs/dice_0004_slice.pdf}%
+    \caption{$\wt{Z}$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=2,width=\textwidth]{./figs/dice_0004_slice.pdf}%
+    \caption{$\wt{Z''}$.}%
+  \end{subfigure}\\%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=3,width=\textwidth]{./figs/dice_0004_slice.pdf}%
+    \caption{$\wt{c}$.}%
+ \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=4,width=\textwidth]{./figs/dice_0004_slice.pdf}%
+    \caption{$\wt{c''}$.}%
+  \end{subfigure}
+  % \\%
+  % \begin{subfigure}[t]{0.48\textwidth}%
+  %   \includegraphics[page=5,width=\textwidth]{./figs/dice_0004_slice.pdf}%
+  %   \caption{$\wt{\dot{\omega}}$.}%
+  % \end{subfigure}
+  \caption{Slices of filtered \gls{dns} data at $z=0.0775\,\unit{m}$ (center height of $\mathcal{V}_3$).}\label{fig:slices}%
+\end{figure}%
+
+\subsection{Generation of the modeling data}\label{sec:gen}
+
+A data set of sample moments and associated sub-filter \glspl{pdf} was
+generated from a statistically stationary single time snapshot at
+$t=0.0626\,\unit{s}$ from this \gls{dns} by considering different
+sub-volumes of the domain that span the flame, from the region of
+premixed burning of the fuel-air mixture from the nozzle to the
+non-premixed burning of the products from the primary premixed flame
+zone. These volumes --- denoted by $\mathcal{V}_i$, where $i=1, \dots, n_v$
+and $n_v = 9$ is the number of sub-volumes --- are centered at
+$z_i = 0.0525\,\unit{m} + (i-1) 0.0125 \,\unit{m}$, with height
+$0.00625\,\unit{m}$ and width $0.14\,\unit{m}$, composed of
+$1146 \times 1146 \times 51$ cells. The locations of several of these
+subregions and planar slices of $\dot{\omega}$ are presented in
+Figure\,\ref{fig:dns}. The premixed burning from the nozzle is evident
+around $z=0.05\,\unit{m}$, with high values of $\dot{\omega}$ and steep
+gradients. Farther downstream of the nozzle, the non-premixed burning
+of the products is evidenced in lower and more diffuse values of
+$\dot{\omega}$. Representative slices of the filtered \gls{dns} data
+in $\mathcal{V}_3$ are presented in Figure\,\ref{fig:slices}. From
+these slices, it is clear that high values of $\wt{Z''}$ and
+$\wt{c''}$ correlated with high values of $\wt{\dot{\omega}}$. The
+core of the flame is fully burned, and the reactions take place in a
+thin region at the interface of the fuel-air mixture from the nozzle
+and co-flow air.
+
+Throughout this work, samples refer to a pointwise sampling of the
+filtered fields, each with an associated collection of moments and
+sub-filter \glspl{pdf}; volumes refer to a subset of the samples
+divided according to regions of the domain; and the sub-filter
+\gls{pdf} for each sample is described by the four sample moments,
+$\left[\wt{Z}, \wt{Z''}, \wt{c}, \wt{c''}\right]$. In each volume,
+sample moments and associated sub-filter \glspl{pdf} were generated by
+using a discrete box filter:
+\begin{align}
+  \label{eq:box}
+  \ol{\phi} (x, y, z) = \frac{1}{n_f^3}\sum_{i=-\nicefrac{n_f}{2}}^{\nicefrac{n_f}{2}} \sum_{~j=-\nicefrac{n_f}{2}}^{\nicefrac{n_f}{2}} \sum_{~k=-\nicefrac{n_f}{2}}^{\nicefrac{n_f}{2}} \phi(x + i \Delta x, y + j \Delta x, z + k \Delta x) 
+\end{align}
+where $\phi$ is the variable to be filtered,
+$n_f = \nicefrac{\ol{\Delta}}{\Delta}$ is the number of points in the
+discrete box filter, $\ol{\Delta} = 32 \Delta x$ is the filter length
+scale, and $\Delta x = 100 \,\unit{\mu m}$ is the smallest spatial
+discretization in the \gls{dns} (six times smaller than the laminar
+flame thickness). The filter length scale was chosen to be
+representative of typical \gls{les} filter scales~\cite{Pitsch2006a}
+and to ensure an adequate sampling of the \gls{pdf} at the filter
+scale. These filters were equidistantly spaced at $8\Delta x$, leading
+to 58800 sub-filter \glspl{pdf} for each volume. The computed
+conditional sub-filter \glspl{pdf} are the density-weighted
+\glspl{pdf} of $Z$ and $c$, discretized with 64 bins in $Z$ and 32 bins
+in $c$. For notational convenience, $P(Z,c) = P(Z = Z^*, c=c^*)$ will
+be used in this work, and the discrete \glspl{pdf} will be referred to
+as \glspl{pdf} instead of \acrlong{pmf}s. The conditional means of the
+reaction rate, $\langle \dot{\omega} | Z, c \rangle$, are also
+computed for each sample with an identical discretization.
+
+Examples of $P(Z,c)$ and $\langle \dot{\omega} | Z, c \rangle$ in
+$\mathcal{V}_3$ for increasing $\wt{\dot{\omega}}$ illustrate the wide
+range of observed shapes, Figure\,\ref{fig:pdfs}. For high
+$\wt{\dot{\omega}}$, the conditional means of $\dot{\omega}$ peak at
+$c=0.16$ and exhibit a bimodal distribution at high $Z$ because of the
+burning of the fuel stream from the nozzle ($Z=1$) and the burning of
+the products mixing with the co-flow. For intermediate
+$\wt{\dot{\omega}}$, the conditional means of $\dot{\omega}$ are
+largest at $Z=0.7$ and $c=0.14$, which is also attributed to the
+burning of the mixed products. As $\wt{\dot{\omega}}$ increases, the
+location of the peak of $P(Z, c)$ increases in the $Z$ and $c$ space
+because reactions happen at higher $Z$ and $c$.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=9,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+    \caption{Marginal $P(Z,c)$ as a function of $Z$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=10,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+    \caption{Marginal $P(Z,c)$ as a function of $c$.}%
+  \end{subfigure}\\%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=11,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+    \caption{Marginal conditional means of $\dot{\omega}$ as a function of $Z$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=12,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+    \caption{Marginal conditional means of $\dot{\omega}$ as a function of $c$.}%
+  \end{subfigure}%
+  \caption{Examples of $P(Z,c)$ and $\langle \dot{\omega} | Z, c \rangle$ for increasing $\wt{\dot{\omega}}$. Red solid: $\wt{\dot{\omega}} = 0$ ($\wt{Z} = 0$, $\wt{Z''} = 0$, $\wt{c} = 0$, $\wt{c''} = 0$); green dashed: $\wt{\dot{\omega}} = 0.03$ ($\wt{Z}  =0.4$, $\wt{Z''}=0.006$, $\wt{c}  =0.03$, $\wt{c''}=0.0006$); blue dash-dotted: $\wt{\dot{\omega}} = 7.4$ ($\wt{Z}  =0.7$, $\wt{Z''}=0.01$, $\wt{c}  =0.08$, $\wt{c''}=0.003$); orange short dashed: $\wt{\dot{\omega}} = 42.2$ ($\wt{Z}  =0.9$, $\wt{Z''}=0.003$, $\wt{c}  =0.12$, $\wt{c''}=0.005$).}\label{fig:pdfs}%
+\end{figure}%
+% \begin{figure}[!tbp]%
+%   \centering%
+%   \begin{subfigure}[t]{0.48\textwidth}%
+%     \includegraphics[page=1,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+%     % \caption{$\wt{Z}=0.0$, $\wt{Z''}=0.0$, $\wt{c}=0.0$, $\wt{c''}=0.0$, and $\wt{\omega}=0.0$.}%
+%     \caption{$\left[ \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''}, \wt{\omega} \right] = 0.0$.}%
+%   \end{subfigure}\hfill%
+%   \begin{subfigure}[t]{0.48\textwidth}%
+%     \includegraphics[page=2,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+%     \caption{$\left[0.400, 0.007, 0.027, 0.001, 0.009\right]$.}%
+%   \end{subfigure}\\%
+%   \begin{subfigure}[t]{0.48\textwidth}%
+%     \includegraphics[page=3,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+%     \caption{$\left[0.626, 0.013, 0.032, 0.002, 0.999 \right]$.}%
+%   \end{subfigure}\hfill%
+%   \begin{subfigure}[t]{0.48\textwidth}%
+%     \includegraphics[page=4,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+%     \caption{$\left[0.671, 0.013, 0.082, 0.003, 1.836 \right]$.}%
+%   \end{subfigure}\\%
+%   \begin{subfigure}[t]{0.48\textwidth}%
+%     \includegraphics[page=5,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+%     \caption{$\left[0.800, 0.010, 0.050, 0.003, 4.1 \right]$.}%
+%   \end{subfigure}\hfill%
+%   \begin{subfigure}[t]{0.48\textwidth}%
+%     \includegraphics[page=6,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+%     \caption{$\left[0.925, 0.004, 0.121, 0.005, 13.9 \right]$.}%
+%   \end{subfigure}%
+%   \caption{Sub-filter \glspl{pdf} in $\mathcal{V}_3$ (centered at $z=0.0775\,\unit{m}$) with increasing $\wt{\dot{\omega}}$.}\label{fig:pdfs}%
+% \end{figure}%
+
+Figure\,\ref{fig:inputs} illustrates the distribution of moments,
+$\left[\wt{Z}, \wt{Z''}, \wt{c}, \wt{c''}\right]$, across the samples
+in $\mathcal{V}_3$. Most sub-filter \glspl{pdf} are associated with
+fully burned states originating from the premixed burning of the
+fuel-air mixture from the nozzle or the nonreacting unburned states
+and are double $\delta$ \glspl{pdf} centered at
+$\left( \wt{Z}, \wt{c} \right) = (1,0.2)$ and $(0,0)$ with small
+$\wt{Z''}$ and $\wt{c''}$. A significant number of sub-filter
+\glspl{pdf}, however, are associated with intermediate states spanning the full
+range of $\wt{Z}$ and $\wt{c}$ with larger $\wt{Z''}$ and $\wt{c''}$ because of
+the non-premixed burning of the products from the primary
+premixed flame zone. It is clear from these data that $\mathcal{V}_3$
+contains characteristics of both types of burning in the flame.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \includegraphics[page=1, height=0.5\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0004.pdf}%
+  \includegraphics[page=2, height=0.5\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0004.pdf}
+  \caption{Scatter plots of moments $\wt{Z}$ and $\wt{c}$ for samples in $\mathcal{V}_3$ (centered at $z=0.0775\,\unit{m}$) colored by $\wt{Z''}$ (left) and $\wt{c''}$ (right) with associated marginal distributions.}\label{fig:inputs}%
+\end{figure}%
+
+\subsection{Machine learning algorithms}\label{sec:methods}
+In this work, we evaluate the performance and suitability of three
+different types of \gls{ml} algorithms, each representative of
+a prevalent class in \gls{ml}: (i) random forest for
+traditional \gls{ml}, (ii) feed-forward \gls{dnn} for deep
+learning, and (iii) \gls{cvae} for generative and unsupervised
+learning.
+
+The model inputs are the four sample moments,
+$\left[ \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''} \right]$, and the outputs
+are the 2048 discrete points representing the joint sub-filter \gls{pdf}
+($64$ in $Z$, $32$ in $c$). The samples from a volume,
+$\mathcal{V}_i~(i=1,\dots, n_v)$, are randomly distributed among two
+distinct data sets: a training data set, $\mathcal{D}_i^t$, used to
+train the algorithms; and a validation data set, $\mathcal{D}_i^v$,
+used to validate the algorithms and comprising $5\%$ of the samples,
+i.e.,\ $|\mathcal{D}_i^v| = 2940$, where $|\cdot|$ denotes the
+cardinality of the data set. Figure\,\ref{fig:gen_data} illustrates
+this process for $\mathcal{V}_5$. In this work, we evaluate different
+models using different training strategies:
+\begin{enumerate}
+\item Models trained using $\mathcal{D}_3^t$ and evaluated on $\mathcal{D}_i^v$ ($i=1, \dots, n_v$);
+\item Models trained using $\mathcal{D}_5^t$ and evaluated on $\mathcal{D}_i^v$ ($i=1, \dots, n_v$);
+\item Models trained using $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$ and evaluated on $\mathcal{D}_i^v$ ($i=1, \dots, n_v$).
+\end{enumerate}
+The first two strategies involve training and validating on different
+physical regions of the flame. The third strategy uses training data
+from the entire flame and the validation data from the training
+regions and intermediate regions. Prior to training, the sample
+moments were independently scaled by subtracting the median and
+dividing the data by the range between the $25^\text{th}$ and
+$75^\text{th}$ quantiles. This scaling is robust to
+outliers~\cite{Pedregosa2011}. A separate scaling was computed for
+each training data set and applied to the associated validation data
+set. The evaluation of a model $m$ on a data set $\mathcal{D}$ is
+denoted $m(\mathcal{D})$.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \includegraphics[width=0.8\textwidth]{./figs/gen_data.pdf}\\%
+  \caption{Illustration of data generation procedure for $\mathcal{V}_5$.}\label{fig:gen_data}%
+\end{figure}%
+
+The first of the investigated models, random forests (RF), is an
+ensemble model that creates ensembles of low-bias/high-variance
+individual decision trees and uses the average of the individual model
+predictions to provide the prediction for the overall
+forest~\cite{Breiman2001}. A decision tree is a model that uses a
+treelike structure to represent nodes that encode conditions based
+on the input variables, branches that split from each node, and
+termination points, i.e.,\ leaves, which provide the target value
+predictions, Figure\,\ref{fig:rf}. The main parameter for a decision
+tree model is the maximum tree depth, which is the length of the
+longest path from the root of the tree to a leaf.
+
+Two key insights have driven the effectiveness of random forests
+models for complex tasks while avoiding
+overfitting~\cite{Fernandez-Delgado2014,Liaw2002}, a problem arising
+when a model is overly accurate on the training data while failing to
+predict non-training data. The first is that it leverages bootstrap
+aggregating or bagging, a method that improves model stability,
+accuracy, and overfitting problems by dividing the training set into
+several smaller training sets, called bootstraps, populated through
+random uniform sampling with replacement. In random forests, each
+decision tree is built using a different bootstrap of the training
+data. The second is that, instead of splitting each node in the
+tree according to the best split of all the variables, the split is
+done using the best split among a random subset of the variables. The
+two key parameters of the random forests algorithm are the number of
+decision trees and the depth of the decision trees. For this work, the
+random forests model contains 100 decision trees and a maximum tree
+depth of 30 nodes, beyond which results were insensitive to the model
+size, and the model size grew larger than can be effectively trained on
+what we consider a typical analysis workstation with 256 GB of
+memory. The total model \gls{dof}, measured as the sum of nodes in
+each tree, is 5.2 million.
+
+The field of deep learning has exhibited success in developing models
+for tasks ranging from image
+processing~\cite{Goodfellow2014,Burger2012,Dosovitskiy2015,Lefkimmiatis2016,Ledig2017,Tai2017,Lai2017}
+to text generation~\cite{Graves2013,Wu2016,Kwon2017} and
+games~\cite{Silver2017}. Several reviews of the field give a summary
+of recent breakthroughs and developments~\cite{Lecun2015,
+  Schmidhuber2015, Prieto2016, Goodfellow2016, Liu2017}. As a first
+example of deep learning, we develop a feed-forward, fully connected
+\gls{dnn} for modeling \glspl{pdf}. Similar to the decoder
+network presented below, this network consists of two hidden layers
+and an output layer. The hidden layers comprise,
+respectively, 256, and 512 fully connected nodes, a leaky rectified
+linear unit activation function:
+\begin{align}
+  \label{eq:relu}
+  y = R(x) =
+  \begin{cases}
+    x, & \text{ if } x \geq 0, \\
+    \alpha x, & \text{ otherwise, }
+  \end{cases}
+\end{align}
+where $x$ is the layer input vector, $y$ is the layer output vector,
+and $\alpha=10^{-2}$ is a small slope; and a batch normalization
+layer~\cite{Ioffe2015}:
+\begin{align}
+  \label{eq:bn}
+  y = B(x) = \gamma \frac{x - \mu_x}{\sqrt{\sigma_x^2 + \epsilon}} + \delta,
+\end{align}
+where $x$ is the layer input vector of size $n$, $y$ is the layer
+output vector of size $n$, $\mu_x = \nicefrac{1}{n} \sum_{i=1}^n x_i$,
+$\sigma_x^2 = \nicefrac{1}{n} \sum_{i=1}^n (x_i - \mu_x)^2$,
+$\epsilon = 10^{-5}$, and $\gamma$ and $\delta$ are learnable
+parameter vectors of the same size as $x$. For inference, i.e.,\
+prediction on new data, the batch normalization layer uses a moving
+average of $\mu_x$ and $\sigma_x$ with a decay of $0.1$ computed
+during training. Because we are interested in predicting \glspl{pdf}, we apply a softmax activation function:
+\begin{align}
+  y = S(x) = \frac{\exp{(x)}}{\sum^n_{i=1} \exp{(x_i)}},
+\end{align}
+where $x$ is the layer input vector of size $n$, and $y$ is the layer
+output vector of size $n$, on the output layer to ensure
+that $\sum^n_{i=1} y_i = 1$ and
+$y_i \in [0,1]~\forall i = 1, \dots, n$. Additionally, the loss
+function for the network is the binary cross entropy between the
+target, $t$, and the output, $y$:
+\begin{align}
+  l(y,t) = \frac{1}{n} \sum_{i=1}^n{\left( t_i \log{(y_i)}+(1-t_i) \log(1-y_i) \right)},
+\end{align}
+and is a good metric for measuring differences between
+\glspl{pdf}. The total \gls{dnn} \gls{dof}, measured as the number of
+trainable parameters, is 1.1 million. The training occurs during 500
+epochs, where an epoch implies one training cycle through the entire
+training data, after which the loss on the training data is
+converged. For each epoch, the training data is fully shuffled and
+divided into batches with 64 training samples per batch. The specific
+gradient descent algorithm for this work is the Adam
+optimizer~\cite{Kingma2014} with an initial learning rate of
+$10^{-4}$. The learning rate is a dimensionless parameter that
+determines the step size of the stochastic gradient descent used to adjust
+the model weights of the neural network. The Adam optimizer presents
+many more advantages than traditional stochastic gradient descent by
+maintaining a per-parameter learning rate, which is adapted during
+training based on exponential moving averages of the first and second
+moments of the gradients. The network was implemented in
+Pytorch~\cite{Paszke2017} and trained on a single NVIDIA Tesla K80
+GPU.
+
+Recently, deep generative algorithms, in the form of
+\glspl{vae}~\cite{Kingma2013, Rezende2014} and
+\glspl{gan}~\cite{Goodfellow2014}, have illustrated how encoding
+features into a latent space can provide an accurate framework for
+generating samples from a learned data distribution. Interpolation and
+other operations in the latent space have shown success in generating
+samples that usefully combine features of the data set. Though
+supervision can be built into the network by adding labels to the
+input and latent spaces, these algorithms are unsupervised learning
+algorithms. The \gls{vae} relies on an encoder, decoder, and loss
+function. The encoder transforms the input data into a latent
+space. Unlike encoders for standard autoencoders, the encoder
+outputs two vectors: a vector of means and a vector of standard
+deviations. These form the parameters of the random normal variable to
+be sampled in the latent space. This implies that, given the same
+data, the encoding in the latent space will differ slightly on
+different passes. The decoder transforms the resulting encoding in
+the latent space into outputs that are designed, through the definition
+of the loss function, to be generated samples from the same
+distribution as the input data. The loss function is a negative
+log-likelihood combined with a regularizer. The negative
+log-likelihood measures the reconstruction loss by the decoder. The
+regularizer is the Kullback-Leibler divergence between the encoder
+distribution and the distribution in the latent space, thereby
+enforcing a continuous latent space. The \gls{vae}
+used in this work follows an hourglass-type architecture,
+Figure\,\ref{fig:cvae}. The encoder network comprises an input
+layer with 2048 nodes, a hidden layer with 512 nodes, and the last
+hidden layer with 256 nodes. The decoder network is a mirror image of
+the encoder (256, 512, and 2048 nodes in each layer). The activation
+functions in the encoder and decoder are rectified linear units. The
+final activation function in the decoder is a softmax function,
+similar to the \gls{dnn}. The total \gls{dnn} \gls{dof}, measured as
+the number of trainable parameters, is 2.3 million. The batch size for
+each epoch is 64, and the network was trained for 500 epochs. The Adam
+optimizer was used with an initial learning rate of $10^{-3}$. The
+latent space dimension is 10. We use a minor variation of the
+\gls{vae} called the \gls{cvae}, allowing for the conditioning of
+the input on a set of labels. The labels are passed both to the
+encoder with the input data and to the decoder with the latent space
+sample data. Therefore, unlike the two previous models, the
+\gls{cvae} model input is the discrete exact sub-filter \glspl{pdf}
+and the four sample moments,
+$\left[ \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''} \right]$ (the sample
+moments are also inputs for the latent space); and the \gls{cvae}
+model output is the discrete modeled sub-filter \gls{pdf}. For
+the sub-filter \gls{pdf} inference, the sample moments are combined with a
+latent space sampling of a standard normal distribution and passed
+through the decoder part of the \gls{cvae}. The network was
+implemented in Pytorch~\cite{Paszke2017} and trained on a single
+NVIDIA Tesla K80 GPU.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \centering
+    \includegraphics[width=0.85\textwidth]{./figs/rf.pdf}%
+    \caption{Decision tree with a tree depth of 3. Green boxes: decision nodes with conditions on the input variables; blue boxes: leaves with output values.}\label{fig:rf}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \centering
+    \includegraphics[width=\textwidth]{./figs/cvae.pdf}%
+    \caption{\Gls{cvae} architecture with input $x$, labels $\ell$, and latent space $z$.}\label{fig:cvae}%
+  \end{subfigure}%
+  \caption{Diagrams of \gls{ml} algorithm architectures.}
+\end{figure}%
+
+Although a conditional \gls{gan} using the infoGAN network
+architecture~\cite{Chen2016a} was evaluated for this work, it did not
+perform as well as the \gls{cvae} because of difficulties related to the
+stability of training a multi-agent model, and results from this model
+are omitted for brevity.
+
+\section{Results}\label{sec:results}
+
+In this section, we present results of using the \gls{ml}
+techniques to model the sub-filter \gls{pdf},
+$P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})$, from
+Equation\,(\ref{eq:convolution}). We first focus on using data from
+the volume centered at $z=0.1025\,\unit{m}$ because this section of the
+domain contains regions that are dominated by premixed burning of the
+fuel-air mixture from the nozzle and the non-premixed burning of the
+products from the primary premixed flame zone, as discussed in
+Section\,\ref{sec:dns}. Next, we evaluate the generalization
+capabilities of the different algorithms by characterizing their
+performance on other sections of the flame.
+
+We quantify model performance with two metrics of interest: the
+Jensen-Shannon divergence~\cite{Endres2003, Osterreicher2003} and the
+filtered progress variable source term. The Jensen-Shannon divergence
+measures the similarity between two \glspl{pdf} and will characterize
+the error in predicting $P(Z,c | \wt{Z}, \wt{Z''}, \wt{c},
+\wt{c''})$. It is a symmetric version of the Kullback-Leibler
+divergence~\cite{Kullback1987}, and it is defined as:
+\begin{align}
+  \label{eq:jsd}
+  J(Q||R) = \frac{1}{2} \left( D(Q || M) + D(R || M)\right)
+\end{align}
+where
+$D(Q||R) = \sum_{i=1}^n R(i) \ln{\left( \frac{R(i)}{Q(i)} \right)}$;
+$M = \nicefrac{1}{2} \left( Q+R \right)$; $Q$ and $R$ are \glspl{pdf}
+of length $n$; and $0\leq J(Q||R) \leq \ln{(2)}$, with low values
+indicating more similarity between $Q$ and $R$. The Jensen-Shannon
+divergence exhibits several advantages over the Kullback-Leibler
+divergence: \glspl{pdf} do not need to have the same support, it is
+symmetric, $J(Q||R) = J(R||Q)$, and it is bounded. The overall
+sub-filter \gls{pdf} prediction accuracy of a model is characterized
+by the $90^{\text{th}}$ percentile of all the Jensen-Shannon
+divergences, denoted $J_{90}$. Examples of sub-filter \gls{pdf}
+modeling using the $\beta$-$\beta$ analytical model illustrate
+different Jensen-Shannon divergence values,
+Figure\,\ref{fig:pdfs_hilo}. This figure is similar to
+Figure\,\ref{fig:pdfs}, though it shows different realizations of
+$P(Z,c)$. The $\beta$-$\beta$ analytical model is not able to capture
+more complex sub-filter \gls{pdf} shapes, such as bimodal
+distributions, leading to high Jensen-Shannon divergence values,
+Figure\,\ref{fig:pdfs_hilo_2}, and it motivates the need for more
+accurate models.  From these results, accurate predictions can be
+expected for $J(P||P_m) < 0.3$, whereas predictions with
+$J(P||P_m) > 0.6$ exhibit incorrect median values and overall shapes.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=3,width=\textwidth]{./figs/pdfs_50429.pdf}\\%
+    \includegraphics[page=4,width=\textwidth]{./figs/pdfs_50429.pdf}%
+    \caption{$J(P||P_{\beta})=0$.}\label{fig:}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=3,width=\textwidth]{./figs/pdfs_44209.pdf}\\%
+    \includegraphics[page=4,width=\textwidth]{./figs/pdfs_44209.pdf}%
+    \caption{$J(P||P_{\beta})=\nicefrac{\ln{(2)}}{2}$.}\label{fig:pdfs_hilo_2}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=3,width=\textwidth]{./figs/pdfs_14523.pdf}\\%
+    \includegraphics[page=4,width=\textwidth]{./figs/pdfs_14523.pdf}%
+    \caption{$J(P||P_{\beta})=0.59$.}\label{fig:}%
+  \end{subfigure}%
+  \caption{Marginal sub-filter \glspl{pdf} for low, mid-range, and high Jensen-Shannon divergence values for the $\beta$-$\beta$ \gls{pdf} model. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:pdfs_hilo}%
+\end{figure}%
+
+The second metric of interest characterizes the error in predicting
+$\wt{\dot{\omega}}$ and is simply the normalized \gls{rmse} of the model predictions, $\wt{\dot{\omega}}_m$:
+\begin{align}
+  \label{eq:rmse}
+  \text{RMSE}(\wt{\dot{\omega}}) = \frac{1}{\wt{\dot{\Omega}}}\sqrt{ \frac{1}{|\mathcal{D}|}\sum_{i=1}^{|\mathcal{D}|}\left( \epsilon(\wt{\dot{\omega}}_i) \right)^2},
+\end{align}
+where
+$\epsilon(\wt{\dot{\omega}}_i) = \wt{\dot{\omega}}_i -
+\wt{\dot{\omega}}_{m,i}$ is the error, $\mathcal{D}$ is the data set
+over which the error is computed, and
+\begin{align}
+  \label{eq:norm}
+  \wt{\dot{\Omega}} = \sqrt{\frac{1}{|\mathcal{D}_T|} \sum_{i=1}^{|\mathcal{D}_T|} \left( \wt{\dot{\omega}}_i \right)^2}
+\end{align}
+is the normalization constant, and
+$\mathcal{D}_T = \bigcup\limits_{i=1, \dots, n_v} \mathcal{D}_i$. All metrics
+presented are computed with respect to the validation data sets.
+
+\subsection{Sub-filter \acrlong{pdf} predictions}\label{sec:predictions}
+
+\Gls{ml} models were trained using filtered \gls{dns} data
+from $\mathcal{V}_3$ (centered at $z=0.1025\,\unit{m}$), i.e.,\ the
+algorithms were trained on $\mathcal{D}_3^t$, and the metrics were evaluated
+on $\mathcal{D}_3^v$. The random forests model training time for the
+52920 \glspl{pdf} in $\mathcal{D}_3^t$ was $1800\,\unit{s}$ on an Intel
+SandyBridge Xeon processor with $256\,\unit{GB}$ of memory. The
+\gls{dnn} and \gls{cvae} training times were $2200\,\unit{s}$ and
+$3500\,\unit{s}$ on a NVIDIA Tesla K80 GPU.
+
+Several example \gls{pdf} predictions are shown in
+Figure\,\ref{fig:pdfs_hilo}, corresponding to low, medium, and high
+values of $J(P||P_{\beta})$. The \gls{pdf} and the cumulative density
+function for the Jensen-Shannon divergence of the predictions on the
+validation data, $J=J(P||P_m)$, where $P_m$ is the modeled sub-filter
+\gls{pdf}, are presented in Figure\,\ref{fig:jsd}. The three \gls{ml}
+models exhibit similar \gls{pdf} prediction errors with a narrow peak
+close to 0. The prediction error for the $\beta$-$\beta$ analytical
+model is larger than the prediction errors for the \gls{ml} models; see
+Table\,\ref{tab:summary}. Additionally, comparing the training error,
+$J^t_{90}$, to the validation error, $J^v_{90}$, indicates that the
+random forests model overfits the training data (there is a large difference
+between the training and testing error), whereas the deep learning
+algorithms avoid overfitting; Table\,\ref{tab:summary}.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/jsd_dice_0004.pdf}%
+    \caption{\Gls{pdf} of $J$.}\label{fig:jsd_pdf}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=2,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/jsd_dice_0004.pdf}%
+    \caption{Cumulative density function of $J$.}\label{fig:jsd_cdf}%
+  \end{subfigure}%
+  \caption{\Gls{pdf} predictions on validation data. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model.}\label{fig:jsd}%
+\end{figure}%
+
+Model prediction times for each sub-filter \gls{pdf} were computed for all
+models as:
+\begin{align}
+  \label{eq:predict}
+  t_m = \frac{1}{n_t |\mathcal{D}_3^v|} \sum_{i=1}^{n_t} \text{time to evaluate } m(\mathcal{D}_3^v)
+\end{align}
+where $n_t=10$ predictions on the validation data set
+$\mathcal{D}_3^v$, which contains 2940 samples, thereby necessitating
+2940 model evaluations. Although the random forests model accuracy is
+similar to that of the neural networks, the model complexity required
+is such that the prediction time is approximately 20 times longer than
+the \gls{dnn} and \gls{cvae} and the model size is more than 3000 times
+larger; see Table\,\ref{tab:summary}. The need for large amounts of memory
+for training and the slow prediction times illustrate the main
+drawback for the use of the random forests algorithm in production
+simulations from the standpoints of both training and prediction. Because the
+\gls{dnn} and the \gls{cvae} decoder have similar architectures, their
+prediction time is similar. The $\beta$-$\beta$ model sub-filter
+\gls{pdf} computations involve a discrete $\beta$ \gls{pdf} evaluation
+in both $Z$ and $c$ and an outer product to compute the sub-filter
+\gls{pdf}, leading to prediction times comparable with the random
+forests model. The $\beta$ \gls{pdf} was computed through the SciPy
+library~\cite{Jones2001}.
+
+\begin{table}[!tbp]
+  \centering
+  \begin{tabular}{lccccccc}
+    \toprule
+    Model & $J^t_{90}$ & $J^v_{90}$ & $t_m\,(\unit{ms})$ & \gls{rmse}$(\wt{\dot{\omega}})$& $R^2(\wt{\dot{\omega}})$ & \gls{dof} (million)& Memory (MB)\\
+    \midrule
+    RF            & 0.03 & 0.12 & 0.932 & 0.22 & 0.97 & 5.2 & 82107 \\
+    \gls{dnn}     & 0.11 & 0.11 & 0.036 & 0.23 & 0.97 & 1.1 & 27 \\
+    \gls{cvae}    & 0.11 & 0.12 & 0.038 & 0.22 & 0.97 & 2.3 & 36 \\
+    $\beta$-$\beta$ & 0.35 & 0.35 & 1.178 & 0.63 & 0.75 & {--} & {--} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Summary of model performance and size for $P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})$ and $\wt{\dot{\omega}}$.}\label{tab:summary}
+\end{table}
+
+The \gls{pdf} models were used to provide predictions of the reaction rate,
+$\wt{\dot{\omega}}$, by convoluting the predicted sub-filter \gls{pdf} with
+the reaction rate, Equation\,\ref{eq:convolution}, where
+$\langle \dot{\omega} | Z, c \rangle$ is from the same $32^3$ box as
+that used to generate $P(Z,c | \wt{Z}, \wt{Z''}, \wt{c},
+\wt{c''})$. This ensures that the errors observed in the predictions of
+$\wt{\dot{\omega}}$ can be exclusively attributed to the sub-filter
+\gls{pdf} modeling. Table\,\ref{tab:summary} and
+Figure\,\ref{fig:convolution} illustrate the different model
+performances in predicting $\wt{\dot{\omega}}$. The coefficient of
+determination, $R^2$, is above $0.95$ for the three \gls{ml}
+models, indicating a high model accuracy, whereas that of the
+$\beta$-$\beta$ model is significantly lower. The three different
+\gls{ml} algorithms achieve similar results,
+Figure\,\ref{fig:convolution}. The \gls{pdf} of the error,
+$\epsilon(\wt{\dot{\omega}})$, is symmetric, indicating that the
+models are not biased toward under- or overpredicting. The
+$\beta$-$\beta$ analytical model has a broad range of prediction errors
+and tends to underpredict $\wt{\dot{\omega}}$ for
+$\wt{\dot{\omega}} > 5$ in this volume,
+Figure\,\ref{fig:convolution_scatter}.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_dice_0004.pdf}%
+    \caption{$\wt{\dot{\omega}}$ predictions.}\label{fig:convolution_scatter}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=2,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_dice_0004.pdf}%
+    \caption{\gls{pdf} of $\epsilon(\wt{\dot{\omega}})$.}\label{fig:convolution_pdf}%
+  \end{subfigure}%
+  \caption{Reaction rate predictions. Red squares and solid: RF; green diamonds and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange pentagons and short dashed: $\beta$-$\beta$ model.}\label{fig:convolution}%
+\end{figure}%
+
+
+\subsection{Model generalization}\label{sec:predictions_all}
+
+\begin{figure}[!tbp]%
+  \centering%
+  \includegraphics[page=4,width=0.5\textwidth]{./figs/pdf_distances.pdf}\\%
+  \caption{The $90^{\text{th}}$ percentile of $r_{i,j}$ as a function
+    of height. Red squares and solid: $r_{3,j}$ for $j=1,\dots,n_v$;
+    green diamonds and dashed: $r_{5,j}$ for $j=1,\dots,n_v$; blue
+    circles and dash-dotted: $r_{i,j}$ for $i=[1,3,5,7,9]$ and
+    $j=2,4,6,\,\text{and}\ 8$.}\label{fig:r90}%
+\end{figure}%
+
+In this section, we examine the performance of the models trained
+using different data sets and their ability to generalize to data from
+other regions of the flame. An understanding of model generalization
+has important implications for the model's applicability to other
+physical configurations. Because of the nature of the low-swirl burner
+flame, a wide range of different physical processes are encountered in
+different regions of the flame, and it is important to understand the
+conditions for a model's applicability.
+
+Three versions of the models were trained: (i) using $\mathcal{D}_3^t$
+(volume centered at $z=0.0775\,\unit{m}$); (ii) using data from a volume
+farther downstream, $\mathcal{D}_5^t$ (volume centered at
+$z=0.1025\,\unit{m}$); and (iii) trained using data from every other
+volume
+$\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$.
+Note that for the random forests trained on all volumes, the maximum depth size
+of the trees was reduced to 18 to avoid out-of-memory errors
+on a 256 GB node (the resulting model size exceeded 110 GB).
+
+The difference between the \glspl{pdf} in different volumes is quantified
+through the minimum of the pairwise Jensen-Shannon divergence between
+all \glspl{pdf} belonging to $\mathcal{V}_i$ and all \glspl{pdf} belonging to
+$\mathcal{V}_j$:
+\begin{align}
+  \label{eq:distance}
+  r_{i,j} = \min_{k=1,\dots, |\mathcal{D}_i^v|} J( P_k || P_l )\quad \forall P_k \in \mathcal{D}_i^v,\ \forall P_l \in \mathcal{D}_j^v.
+\end{align}
+Low values of $r_{i,j}$ indicate that
+$\forall P_l \in \mathcal{D}_j^v$ there is $P_k \in \mathcal{D}_i^v$,
+which has a small Jensen-Shannon divergence and, therefore, a similar
+shape. The $90^{\text{th}}$ percentile of $r_{i,j}$, $r_{90}$, for
+different data sets is presented in Figure\,\ref{fig:r90}. For
+$\mathcal{V}_3$, it is clear that the \glspl{pdf} in regions of the flame
+that are farther downstream or upstream are significantly
+different; however, models trained using data from every other volume,
+$\mathcal{D}^t$, have training data that are representative of the
+entire simulation domain.
+
+Figure\,\ref{fig:gen} presents the predictions for the three different
+model versions. For models trained using data from only one volume,
+the \gls{pdf} prediction error is lowest for that volume and increases as
+the model is used on downstream or upstream volumes.  All three types
+of \gls{ml} algorithms predict similar generalization error
+profiles. This indicates that these models, including the generative
+algorithm, are unable to extrapolate to non-proximate regions of the
+flame. This is consistent with the observation that the training data
+are not representative of the entire flow, Figure\,\ref{fig:r90}. The
+\gls{rmse}$(\wt{\dot{\omega}})$ decreases as a function of $z$ because the
+mean $\wt{\dot{\omega}}$ decreases as a function of $z$ as
+well. Models trained with $\mathcal{D}_5^t$ perform slightly better in
+the upstream portion of the domain, Figure\,\ref{fig:gen_5}, because
+the \glspl{pdf} in $\mathcal{V}_5$ are more representative of the upstream
+\glspl{pdf}, but fail to capture those where the premixed burning at the
+nozzle is dominant ($z\approx 0.05\,\unit{m}$), Figure\,\ref{fig:r90}.
+
+Models trained using every other volume achieve errors that are
+approximately half the error of the $\beta$-$\beta$ analytical model,
+Figure\,\ref{fig:gen_skip}. This indicates that the models are capable
+of interpolating the sample space across the entire physical domain
+while using only a small subsection of the samples in the domain. The
+\gls{ml} models achieve very good accuracy and approximate the
+conditional means of $\wt{\dot{\omega}}$, which is the optimal
+estimator using these data,
+Figure\,\ref{fig:convolution_skip}. Significant overpredictions in
+the $\beta$-$\beta$ model are observed. These are driven by errors in
+upstream volumes, Figure\,\ref{fig:gen_skip}, particularly at high
+$\wt{Z}$ and $\wt{c}$, Figure\,\ref{fig:convolution_skip}. Sample \glspl{pdf}
+where $\wt{\dot{\omega}} > 15$ are shown in
+Figure\,\ref{fig:pdfs_skip} for different Jensen-Shannon divergences
+computed on the \gls{dnn} model. Bimodal distributions are accurately
+predicted by the \gls{ml} models, and, even for the worse
+case, Figure\,\ref{fig:pdfs_skip_3}, the shapes in $Z$ and $c$ are well
+modeled. 
+
+In addition to demonstrating the accuracy of the \gls{ml}
+algorithms, these results illustrate that the $90^{\text{th}}$
+percentile of $r_{i,j}$ is a good metric for characterizing \gls{pdf}
+similarity and provides a model generalization criteria,
+$r_{90} < 0.2$, for an a-priori assessment of model performance on new
+data. Models trained using a data set that has an $r_{90} < 0.2$ with
+another data set will produce joint sub-filter \glspl{pdf} exhibiting
+$J_{90} < 0.2$ and, consequently, accurate $\wt{\dot{\omega}}$
+predictions. As a demonstration, a \gls{dnn} model was trained using
+samples from the negative $x$-half of the volume $\mathcal{V}_3$ of
+the axisymmetric flame (centered at $x=y=0\,\unit{m}$), i.e.,\
+$\mathcal{D}^t = \{ s~|~s \in \mathcal{D}_3^t,~x_s < 0\,\unit{m}\}$, and
+validated on predictions of samples in the positive $x$-half of the
+other volumes,
+$\mathcal{D}^v = \{ s~|~s \in \mathcal{D}_i^v,~x_s >
+0\,\unit{m},~i=1,\dots, n_v\}$. This model performs accurately on
+\gls{pdf} predictions in nearby volumes, e.g., $J_{90} \approx 0.15$ in
+$\mathcal{V}_2$ and $\mathcal{V}_3$, and performs poorly at locations
+farthest downstream, e.g.,\ $J_{90} = 0.63$ in $\mathcal{V}_7$.
+
+The results in this section illustrate (i) the importance of using
+data representative of the extent of the physical processes present in
+the simulation and (ii) the potential to develop in situ \gls{ml}
+modeling capabilities, where the model is developed during the
+simulation, without adversely affecting the simulation time because
+the most accurate models were trained using data from less than $4\%$
+of the total \gls{dns} domain volume.
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=1,width=\textwidth]{./figs/dice_predictions_0004.pdf}\\%
+    \includegraphics[page=2,width=\textwidth]{./figs/dice_predictions_0004.pdf}%
+    \caption{$\mathcal{D}_3^t$ ($z_3=0.0775\,\unit{m}$).}\label{fig:gen_3}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=1,width=\textwidth]{./figs/dice_predictions_0006.pdf}\\%
+    \includegraphics[page=2,width=\textwidth]{./figs/dice_predictions_0006.pdf}%
+    \caption{$\mathcal{D}_5^t$ ($z_5=0.1025\,\unit{m}$).}\label{fig:gen_5}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=1,width=\textwidth]{./figs/dice_predictions_skip.pdf}\\%
+    \includegraphics[page=2,width=\textwidth]{./figs/dice_predictions_skip.pdf}%
+    \caption{$\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$.}\label{fig:gen_skip}%
+  \end{subfigure}%
+  \caption{$J_{90}$ and \gls{rmse}$(\wt{\dot{\omega}})$ as a function of
+    height using \gls{ml} algorithms trained with data from different
+    sections of the flame. Red squares and solid: RF; green diamonds
+    and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange
+    pentagons and short dashed: $\beta$-$\beta$ model.}\label{fig:gen}%
+\end{figure}%
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.3cm 1.3cm, clip=true]{./figs/convolution_skip.pdf}%
+    \caption{$\wt{\dot{\omega}}$ predictions.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=3,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_skip.pdf}%
+    \caption{Conditional means of $\wt{\dot{\omega}}$ as a function of $\wt{z}$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=4,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_skip.pdf}%
+    \caption{Conditional means of $\wt{\dot{\omega}}$ as a function of $\wt{c}$.}%
+  \end{subfigure}%
+  \caption{Reaction rate predictions for models trained on $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$. Red squares and solid: RF; green diamonds and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange pentagons and short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:convolution_skip}%
+\end{figure}%
+
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=3,width=\textwidth]{./figs/pdfs_66089.pdf}\\%
+    \includegraphics[page=4,width=\textwidth]{./figs/pdfs_66089.pdf}%
+    \caption{$J(P||P_{\text{\gls{dnn}}})=0.05$.}\label{fig:}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=3,width=\textwidth]{./figs/pdfs_159948.pdf}\\%
+    \includegraphics[page=4,width=\textwidth]{./figs/pdfs_159948.pdf}%
+    \caption{$J(P||P_{\text{\gls{dnn}}})=0.1$.}\label{fig:}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.32\textwidth}%
+    \includegraphics[page=3,width=\textwidth]{./figs/pdfs_182976.pdf}\\%
+    \includegraphics[page=4,width=\textwidth]{./figs/pdfs_182976.pdf}%
+    \caption{$J(P||P_{\text{\gls{dnn}}})=0.21$.}\label{fig:pdfs_skip_3}%
+  \end{subfigure}%
+  \caption{Marginal sub-filter \glspl{pdf} for median and high Jensen-Shannon divergence values for models trained on $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:pdfs_skip}%
+\end{figure}%
+
+\section{Conclusion}\label{sec:ccl}
+
+In this work, we used three different \gls{ml} algorithms
+representative of different types of \gls{ml} (traditional
+methods, deep learning, and generative learning) to design presumed
+\gls{pdf} models for combustion applications. We showed that models
+designed through \gls{ml} are better able to capture the
+complexity of these sub-filter \glspl{pdf} than analytical
+models. Although the random forests model predicts results similar to those of the
+deep learning models, this model is not suitable for in situ training
+and modeling because of the model complexity, which leads to high memory
+requirements and high prediction times. The deep learning algorithms
+were able to achieve the same high accuracy with fast prediction
+times and low model complexity. Generative learning models, which
+present advantages in many deep learning applications through the use
+of a latent space representation, do not provide increased accuracy or
+better generalization characteristics compared to feed-forward neural
+networks. Additionally, the deep learning models provide fast
+predictions relative to the $\beta$-$\beta$ model, indicating that
+these methods might at the very least be efficient encoders of
+$\beta$-$\beta$ tabulation models by using \gls{dns} as a source of
+training data, resulting in encodings that provide more useful forms
+of the joint sub-filter \gls{pdf} not expressible by the
+$\beta$-$\beta$ model. Our results illustrate methodologies that can
+be successfully leveraged to derive accurate deep learning models for
+a wide range of applications. The results exhibited throughout this
+work indicate that deep learning models can be advantageously used for
+in situ modeling of turbulent combustion flows. These deep learning
+algorithms are readily integrated with scientific computing codes
+through PyTorch's C\texttt{++} API for future a-posteriori model
+evaluation.
+
+This work --- including neural network models, analysis scripts, Jupyter
+notebooks, and figures --- can be publicly accessed at the project's
+GitHub
+page.\footnote{\url{https://github.com/NREL/ml-combustion-pdf-models}}
+Traditional \gls{ml} algorithms were implemented through
+scikit-learn~\cite{Pedregosa2011} and the deep learning algorithms
+through PyTorch~\cite{Paszke2017}.
+
+\section*{Acknowledgments}
+This work was authored in part by the National Renewable Energy Laboratory, operated by Alliance for Sustainable Energy, LLC, for the U.S. Department of Energy (DOE) under Contract No. DE-AC36-08GO28308. Funding provided by U.S. Department of Energy Office of Science and National Nuclear Security Administration. The views expressed in the article do not necessarily represent the views of the DOE or the U.S. Government. The U.S. Government retains and the publisher, by accepting the article for publication, acknowledges that the U.S. Government retains a nonexclusive, paid-up, irrevocable, worldwide license to publish or reproduce the published form of this work, or allow others to do so, for U.S. Government purposes.
+
+This research was supported by the Exascale Computing Project (ECP), Project Number: 17-SC-20-SC, a collaborative effort of two DOE organizations -- the Office of Science and the National Nuclear Security Administration -- responsible for the planning and preparation of a capable exascale ecosystem -- including software, applications, hardware, advanced system engineering, and early testbed platforms -- to support the nation's exascale computing imperative.
+
+\section*{References}
+
+\bibliography{library}
+
+\end{document}

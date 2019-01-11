@@ -1,0 +1,25 @@
+.DS_Store
+__pycache__
+.ipynb_checkpoints/
+*.npz
+*.csv
+*.gz
+events.out.tfevents.*
+Pipfile.lock
+
+# latex
+report.aux
+report.log
+report.nav
+report.out
+report.snm
+report.toc
+report.vrb
+report.pdf
+report.bbl
+report.blg
+report.spl
+report.acn
+report.glo
+report.ist
+auto

@@ -1,0 +1,618 @@
+\documentclass[xcolor=dvipsnames]{beamer}
+%\documentclass[aspectratio=169,xcolor=dvipsnames]{beamer}
+
+%=================================================================================
+% Document information
+\def\firstname{Marc}
+\def\familyname{Henry de Frahan}
+\def\FileAuthor{\firstname~\familyname}
+\def\FileTitle{ParCFD 2017}
+\def\FileSubject{ParCFD 2017}
+\def\FileKeyWords{\firstname~\familyname, \FileSubject, \FileTitle}
+
+%=================================================================================
+% Preamble
+\input{preamble.tex}
+
+\title[]{}
+\author[Marc T. Henry de Frahan]{Marc T. Henry de Frahan}
+\date{\today}
+
+\begin{document}
+\presentation
+
+%=================================================================================
+% Objective
+\section{Introduction}\label{sec:intro}
+\begin{frame}{Overview}
+\tableofcontents
+\end{frame}
+\subsection{Objective}\label{sec:objective}
+\frame{
+  \frametitle{ML for presumed PDF combustion models.}
+  Presumed PDF model:
+  \begin{align*}
+    \langle \wt{\dot{\omega}} | \wt{Z}, \wt{Z''}, \wt{C}, \wt{C''}\rangle = \int \langle \dot{\omega} | Z, C \rangle P(Z,C | \wt{Z}, \wt{Z''}, \wt{C}, \wt{C''}) \ud Z \ud C
+  \end{align*}
+  where:\\
+  \hspace{1cm}$Z$ is the mixture fraction\\
+  \hspace{1cm}$C$ is the progress variable\\
+  \hspace{1cm}$\dot{\omega}$ is the reaction rate\\
+  \hspace{1cm}$\wt{Z} = \nicefrac{\sum{\rho Z}}{\sum{\rho}}$ (similarly for $\wt{C}$ and $\wt{\dot{\omega}}$)\\
+  \hspace{1cm}$\wt{Z''} = \nicefrac{\sum{\rho (Z-\wt{Z})^2}}{\sum{\rho}}$ (similarly for $\wt{C''}$)\\[1cm]
+
+  \textbf{Objective}: ML for $P(Z,C | \wt{Z}, \wt{Z''}, \wt{C}, \wt{C''})$
+  
+}
+
+%=================================================================================
+% Data
+\subsection{Data generation}\label{sec:data}
+\frame{
+  \frametitle{Generation of PDFs (data for ML).}
+  \structure{3D volume of data from DNS of combustion flame}\\
+  \hspace{1cm}6 volumes at different heights ($1146 \times 1146 \times 51$)\\
+  \hspace{1cm}for now using one in the middle of the domain (dice0002)\\[0.5cm]
+  \structure{PDF generation in each dice}\\
+  \hspace{1cm}$32^3$ box filter with stride of 8 leading to 58k PDFs\\
+  \hspace{1cm}compute $P(Z,C | \wt{Z}, \wt{Z''}, \wt{C}, \wt{C''})$ (density weighted)\\
+  \hspace{1cm}each PDF has 2048 values (64 bins in $Z$, 32 bins in $C$)\\
+  \hspace{1cm}data divided into training, dev, test sets ($90\%$, $5\%$, $5\%$)
+}
+\frame{
+  \frametitle{Dice 2: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0002_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0002_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0002_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0002_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0002_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0002.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0002.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0002.pdf}%
+  \end{figure}%
+}
+\frame{
+  \frametitle{Dice 3: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0003_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0003_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0003_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0003_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0003_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0003.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0003.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0003.pdf}%
+  \end{figure}%
+}
+\frame{
+  \frametitle{Dice 4: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0004_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0004_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0004_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0004_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0004_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0004.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0004.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0004.pdf}%
+  \end{figure}%
+}
+\frame{
+  \frametitle{Dice 5: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0005_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0005_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0005_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0005_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0005_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0005.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0005.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0005.pdf}%
+  \end{figure}%
+}
+\frame{
+  \frametitle{Dice 6: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0006_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0006_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0006_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0006_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0006_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0006.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0006.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0006.pdf}%
+  \end{figure}%
+}
+\frame{
+  \frametitle{Dice 7: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0007_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0007_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0007_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0007_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0007_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0007.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0007.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0007.pdf}%
+  \end{figure}%
+}
+\frame{
+  \frametitle{Dice 8: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0008_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0008_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0008_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0008_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0008_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0008.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0008.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0008.pdf}%
+  \end{figure}%
+}
+\frame{
+  \frametitle{Dice 9: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0009_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0009_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0009_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0009_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0009_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0009.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0009.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0009.pdf}%
+  \end{figure}%
+}
+\frame{
+  \frametitle{Dice 10: slices and PDF input space}
+  \begin{figure}[!tbp]%
+    \centering%
+    \includegraphics[page=1, width=0.2\textwidth]{./figs/dice_0010_slice.pdf}%
+    \includegraphics[page=2, width=0.2\textwidth]{./figs/dice_0010_slice.pdf}%
+    \includegraphics[page=3, width=0.2\textwidth]{./figs/dice_0010_slice.pdf}%
+    \includegraphics[page=4, width=0.2\textwidth]{./figs/dice_0010_slice.pdf}%
+    \includegraphics[page=5, width=0.2\textwidth]{./figs/dice_0010_slice.pdf}\\[1cm]%
+    \includegraphics[page=1, height=0.3\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0010.pdf}%
+    \includegraphics[page=2, height=0.3\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0010.pdf}%
+    \includegraphics[page=3, height=0.3\textwidth, trim=0.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0010.pdf}%
+  \end{figure}%
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+  \begin{align*}
+    \langle \wt{\dot{\omega}} | \wt{Z}, \wt{Z''}, \wt{C}, \wt{C''}\rangle = \int \langle \dot{\omega} | Z, C \rangle P(Z,C | \wt{Z}, \wt{Z''}, \wt{C}, \wt{C''}) \ud Z \ud C
+  \end{align*}
+  where $\langle \wt{\dot{\omega}} | \wt{Z}, \wt{Z''}, \wt{C}, \wt{C''}\rangle$, $\langle \dot{\omega} | Z, C \rangle$, $P(Z,C | \wt{Z}, \wt{Z''}, \wt{C}, \wt{C''})$\newline
+  are from the same $32^3$ block
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_exact.pdf}
+}
+
+%=================================================================================
+% RF and results
+\section{Regression models with machine learning}\label{sec:ml}
+\subsection{Random forest}\label{sec:RF}
+\begin{frame}[fragile]
+  \frametitle{ML \#1: Random Forest, 100 trees, max depth of 30}
+  {\small \verbatiminput{./figs/RF.log}}
+\end{frame}
+
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/RF.pdf}
+  \includepdf[pages={2,3}]{./figs/RF.pdf}
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_RF.pdf}
+}
+
+%=================================================================================
+% LR and results
+\subsection{Linear regression}\label{sec:LR}
+\begin{frame}[fragile]
+  \frametitle{ML \#2: Linear regression (clipped and normalized)}
+  {\small \verbatiminput{./figs/LR.log}}
+\end{frame}
+
+% results
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/LR.pdf}
+  \includepdf[pages={2,3}]{./figs/LR.pdf}
+}
+
+% =================================================================================
+% PR and results
+\subsection{Polynomial regression}\label{sec:PR}
+\begin{frame}[fragile]
+  \frametitle{ML \#3: Polynomial regression (clipped and normalized)}
+  \only<1>{\small Order 1:\vspace{-0.4cm} \verbatiminput{./figs/LR.log}}
+  \only<2>{\small Order 2:\vspace{-0.4cm} \verbatiminput{./figs/PR2.log}}
+  \only<3>{\small Order 3:\vspace{-0.4cm} \verbatiminput{./figs/PR3.log}}
+  \only<4>{\small Order 6:\vspace{-0.4cm} \verbatiminput{./figs/PR6.log}}
+\end{frame}
+
+% results for PR6
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/PR6.pdf}
+  \includepdf[pages={2,3}]{./figs/PR6.pdf}
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_PR6.pdf}
+}
+
+
+%=================================================================================
+% DNN and results
+\subsection{DNN}\label{sec:DNN}
+\begin{frame}[fragile]
+  \frametitle{ML \#4: DNN, $[256,512,2048]$ nodes, BCEloss, $l = 10^{-4}$}
+  {\small \verbatiminput{./figs/DNN.log}}
+\end{frame}
+
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/DNN.pdf}
+  \includepdf[pages={2,3}]{./figs/DNN.pdf}
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_DNN.pdf}
+}
+
+%=================================================================================
+% CVAE and results
+\section[Generative models]{Generative models}\label{sec:gm}
+\subsection{Conditional Variational Autoencoder}\label{sec:CVAE}
+\begin{frame}[fragile]
+  \frametitle{GM \#1: CVAE}
+  {\small \verbatiminput{./figs/CVAE.log}}
+\end{frame}
+
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/CVAE.pdf}
+  \includepdf[pages={2,3}]{./figs/CVAE.pdf}
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_CVAE.pdf}
+}
+
+%=================================================================================
+% CGAN and results
+\subsection{Conditional Generative Adversarial Network}\label{sec:CGAN}
+\begin{frame}[fragile]
+  \frametitle{GM \#2: CGAN}
+  {\small \verbatiminput{./figs/CGAN.log}}
+\end{frame}
+
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/CGAN.pdf}
+  \includepdf[pages={2,3}]{./figs/CGAN.pdf}
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_CGAN.pdf}
+}
+
+%=================================================================================
+% delta-delta and results
+\section{Physics models}\label{sec:physics}
+\subsection{$\delta-\delta$ model}\label{sec:DD}
+\begin{frame}[fragile]
+  \frametitle{Physics \#1: $\delta-\delta$ PDF}
+  {\small \verbatiminput{./figs/DD.log}}
+\end{frame}
+
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/DD.pdf}
+  \includepdf[pages={2,3}]{./figs/DD.pdf}
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_DD.pdf}
+}
+
+%=================================================================================
+% beta-delta and results
+\subsection{$\beta-\delta$ model}\label{sec:BD}
+\begin{frame}[fragile]
+  \frametitle{Physics \#2: $\beta(Z)-\delta(C)$ PDF}
+  {\small \verbatiminput{./figs/BD.log}}
+\end{frame}
+
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/BD.pdf}
+  \includepdf[pages={2,3}]{./figs/BD.pdf}
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_BD.pdf}
+}
+
+%=================================================================================
+% beta-beta and results
+\subsection{$\beta-\beta$ model}\label{sec:BB}
+\begin{frame}[fragile]
+  \frametitle{Physics \#3: $\beta(Z)-\beta(C)$ PDF}
+  {\small \verbatiminput{./figs/BB.log}}
+\end{frame}
+
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1}]{./figs/BB.pdf}
+  \includepdf[pages={2,3}]{./figs/BB.pdf}
+}
+
+\frame{
+  \frametitle{Convolution prediction}
+}
+{
+  \setbeamercolor{background canvas}{bg=}
+  \includepdf[pages={1,2}]{./figs/convolution_BB.pdf}
+}
+
+%=================================================================================
+% timings
+\section{Summary}\label{sec:summary}
+\frame{
+  \frametitle{Model performance summary}
+  \begin{table}[]
+    \begin{tabular}{lccccc}
+      \toprule
+      model & $J_{90}$ & Prediction time (s) & RMSE for $\widetilde{\dot{\omega}}$ & $R^2$ for $\widetilde{\dot{\omega}}$ & Size (MB)\\
+      \midrule
+      RF            & 0.12 & 2.75 & 0.4  &  0.96 & 82149 \\
+      DNN           & 0.11 & 0.15 & 0.35 &  0.97 & 27    \\
+      CVAE          & 0.12 & 0.11 & 0.34 &  0.97 & 36    \\
+      $\beta-\beta$ & 0.33 & {--} & 1.05 &  0.7  & {--}  \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+}
+
+%=================================================================================
+% generalization
+\section{Generalization}\label{sec:generalization}
+\frame{
+  \frametitle{Predicting on other dices}
+  \tiny
+
+  % RF
+  \setbeamercolor{coloredbox}{fg=black,bg=c2med}
+  \begin{beamercolorbox}[wd=\textwidth,sep=1ex]{coloredbox}
+    \centering
+    RF
+  \end{beamercolorbox}
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on dice 2\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 & 0.225506 & 2.546500 \\
+      2 & 0.121005 & 0.398052 \\
+      3 & 0.311023 & 0.302434 \\
+      4 & 0.540858 & 0.247165 \\
+      5 & 0.637645 & 0.189663
+    \end{tabular}
+  \end{minipage}\hfill%
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on dice 3\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 & 0.471538 & 14.606095 \\
+      2 & 0.212643 &  2.163460 \\
+      3 & 0.151371 &  0.165814 \\
+      4 & 0.304312 &  0.149800 \\
+      5 & 0.513507 &  0.117921
+    \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on all dices\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 & 0.038393 & 0.319048 \\
+      2 & 0.119613 & 0.351820 \\
+      3 & 0.179026 & 0.155962 \\
+      4 & 0.211864 & 0.096622 \\
+      5 & 0.251139 & 0.082761
+    \end{tabular}
+  \end{minipage}\\[0.3cm]
+
+  % DNN
+  \begin{beamercolorbox}[wd=\textwidth,sep=1ex]{coloredbox}
+    \centering
+    DNN
+  \end{beamercolorbox}
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on dice 2\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 & 0.302302 & 1.511685 \\
+      2 & 0.113093 & 0.352330 \\
+      3 & 0.269360 & 0.267391 \\
+      4 & 0.523166 & 0.204584 \\
+      5 & 0.586430 & 0.154679
+    \end{tabular}
+  \end{minipage}\hfill%
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on dice 3\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 & 0.638801 & 4.430153 \\
+      2 & 0.221772 & 0.997562 \\
+      3 & 0.145944 & 0.185941 \\
+      4 & 0.283154 & 0.132489 \\
+      5 & 0.466592 & 0.101539
+    \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on all dices\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 & 0.051776 & 0.538867\\
+      2 & 0.122495 & 0.369603\\
+      3 & 0.164724 & 0.173918\\
+      4 & 0.184673 & 0.104286\\
+      5 & 0.223159 & 0.080714
+    \end{tabular}
+  \end{minipage}\\[0.3cm]
+
+  % CVAE
+  \setbeamercolor{coloredbox}{fg=black,bg=c2med}
+  \begin{beamercolorbox}[wd=\textwidth,sep=1ex]{coloredbox}
+    \centering
+    CVAE
+  \end{beamercolorbox}
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on dice 2\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 & 0.266282 & 1.527464 \\
+      2 & 0.116341 & 0.344944 \\
+      3 & 0.334746 & 0.324995 \\
+      4 & 0.693120 & 0.236547 \\
+      5 & 0.693147 & 0.173310
+    \end{tabular}
+  \end{minipage}\hfill%
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on dice 3\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 &  0.667684 & 8.935289 \\
+      2 &  0.244925 & 1.212532 \\
+      3 &  0.142852 & 0.169246 \\
+      4 &  0.350593 & 0.144737 \\
+      5 &  0.641043 & 0.108570
+    \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}{.3\linewidth}
+    \centering
+    Trained on all dices\\[0.1cm]
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 &  0.053327 & 0.427858 \\
+      2 &  0.122943 & 0.391131 \\
+      3 &  0.157860 & 0.172827 \\
+      4 &  0.176537 & 0.101066 \\
+      5 &  0.214239 & 0.079102
+    \end{tabular}
+  \end{minipage}
+}
+
+\frame{
+  \frametitle{Predicting on other dices}
+  \tiny
+
+  % BB
+  \setbeamercolor{coloredbox}{fg=black,bg=c2med}
+  \begin{beamercolorbox}[wd=\textwidth,sep=1ex]{coloredbox}
+    \centering
+    BB
+  \end{beamercolorbox}
+  \hfill
+  \begin{minipage}{.3\linewidth}
+    \centering
+    \begin{tabular}{ccc}
+      dice & JSD 90 & RMSE\\
+      \hline
+      1 & 0.129426 & 1.312838 \\
+      2 & 0.326514 & 1.044414 \\
+      3 & 0.417348 & 0.522793 \\
+      4 & 0.456653 & 0.261347 \\
+      5 & 0.515507 & 0.180005
+    \end{tabular}
+  \end{minipage}
+}
+
+%=================================================================================
+% conclusions
+\section{Conclusions}\label{sec:ccl}
+\frame{
+  \frametitle{Conclusions}
+  \structure{PDFs are complex in general}\\
+  \hspace{1cm}ML does a good job of capturing complexity\\
+  \hspace{1cm}Analytical models fail to capture complexity\\[0.3cm]
+  \structure{Deep learning algorithms have an advantage in CFD-HPC}\\
+  \hspace{1cm}high accuracy\\
+  \hspace{1cm}fast prediction\\
+  \hspace{1cm}better generalization\\[0.3cm]
+  \structure{Generative algorithms not much of an advantage in this case}\\
+  \hspace{1cm}very similar to DNN\\
+  \hspace{1cm}provide ``realizations'' of PDFs
+}
+
+% % =================================================================================
+% % Bibliography
+% \begin{frame}[allowframebreaks,plain]{Bibliography}
+%   \tiny
+%   \bibliographystyle{model1-num-names}
+%   %\bibliographystyle{jap}
+%   \bibliography{./library}
+% \end{frame}
+
+% \egroup
+
+\end{document}

@@ -1,0 +1,17 @@
+Training data errors
+  MAE: 3.071221e-04
+  MSE: 9.256793e-06
+  std SE: 4.777912e-04
+  R^2: -20437.17
+  JSD 85 percentile: 0.270792
+  JSD 90 percentile: 0.328909
+  JSD 95 percentile: 0.410350
+
+Dev data errors
+  MAE: 3.029113e-04
+  MSE: 8.822015e-06
+  std SE: 4.753460e-04
+  R^2: -3321.46
+  JSD 85 percentile: 0.265109
+  JSD 90 percentile: 0.325865
+  JSD 95 percentile: 0.411260

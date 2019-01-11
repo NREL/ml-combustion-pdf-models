@@ -1,0 +1,334 @@
+\documentclass[xcolor=dvipsnames]{beamer}
+%\documentclass[aspectratio=169,xcolor=dvipsnames]{beamer}
+
+%=================================================================================
+% Document information
+\def\firstname{Marc}
+\def\familyname{Henry de Frahan}
+\def\FileAuthor{\firstname~\familyname}
+\def\FileTitle{ParCFD 2017}
+\def\FileSubject{ParCFD 2017}
+\def\FileKeyWords{\firstname~\familyname, \FileSubject, \FileTitle}
+
+%=================================================================================
+% Preamble
+\input{preamble.tex}
+
+\title[]{}
+\author[Marc T. Henry de Frahan]{Marc T. Henry de Frahan}
+\date{\today}
+
+\begin{document}
+\presentation
+
+%=================================================================================
+% Title page
+\bgroup
+\setbeamertemplate{background}{\begin{tikzpicture}\node at (0,0){};\node[inner sep=0,opacity=1]{\includegraphics[width=1\paperwidth,height=1\paperheight]{./figs/ecp_title_4x3.jpg}};\end{tikzpicture}}
+\frame[plain]{
+  \hspace*{0.cm}\begin{minipage}{1\textwidth}
+    \vspace*{-0.7cm}                                      
+    \textbf{\textcolor{black}{\LARGE A-priori analysis of joint PDF of mixture fraction and progress variable trained using machine learning techniques}}\par
+    \vspace*{2.cm}
+    \textbf{\textcolor{black}{\large \mbox{M. T. Henry de Frahan$^\text{a}$}, S. Yellapantula$^\text{a}$,}}\\[0.1cm]
+    \textbf{\textcolor{black}{\large R. King$^\text{b}$, M. Day$^\text{c}$, R. Grout$^\text{a}$}}\\[0.1cm]
+    \textbf{\textcolor{black}{\footnotesize November 20, 2018}}\\
+    \textit{\scriptsize\textcolor{black}{$^\text{a}$High Performance Algorithms and Complex Fluids, NREL}}\\[-0.1cm]
+    \textit{\scriptsize\textcolor{black}{$^\text{b}$Complex Systems Simulation and Optimization Group, NREL}}\\[-0.1cm]
+    \textit{\scriptsize\textcolor{black}{$^\text{c}$Center for Computational Sciences and Engineering, LBNL}}\\[0.2cm]
+  \end{minipage}
+  % \begin{textblock*}{\paperwidth}[0,0](0.\paperwidth,0.25\paperheight)
+  %   \includegraphics[width=\paperwidth]{./figs/wallhump_white.png}
+  % \end{textblock*}
+  \setcounter{framenumber}{0}
+  \begin{textblock*}{4.cm}[1,1](0.39\paperwidth,.91\paperheight)
+    \includegraphics[width=1\textwidth]{./figs/logos/nrel.jpg}
+  \end{textblock*}
+  \begin{textblock*}{2.3cm}[1,1](0.67\paperwidth,.9\paperheight)
+    \includegraphics[width=1\textwidth]{./figs/logos/lbl.png}
+  \end{textblock*}
+  }
+\egroup
+
+% Everyone has the same background
+\bgroup
+\setbeamertemplate{background}{\begin{tikzpicture}\node at (0,0){};\node[inner sep=0,opacity=1]{\includegraphics[width=1\paperwidth,height=1\paperheight]{./figs/ecp_main_4x3.jpg}};\end{tikzpicture}}
+
+% ================================================================================
+% Motivation/objective
+\frame{
+  \frametitle{Presumed PDF modeling for large eddy simulations of combustion processes.}
+  \setlength{\fboxsep}{4pt}
+  \begin{align*}
+    \highlight[c1med!70]{\wt{\dot{\omega}}} = \int \highlight[c2med!70]{\langle \dot{\omega} | Z, c \rangle \strut} \quad \highlight[c3med!70]{\strut P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})} \ud Z \ud c
+  \end{align*}
+  $\highlight[c1med!70]{\wt{\dot{\omega}}}$ is the Favre filtered progress variable source term\\[0.2cm]
+  $\highlight[c2med!70]{\langle \dot{\omega} | Z, c \rangle \strut}$ is the conditional means of $\dot{\omega}$\\[-0.1cm]
+  \mbox{\hphantom{$\highlight[c2med!70]{\langle \dot{\omega} | Z, c \rangle \strut}$} often modeled based on physical theories}\\
+  \mbox{\hphantom{$\highlight[c2med!70]{\langle \dot{\omega} | Z, c \rangle \strut}$} computed from the data in this work}\\[0.2cm]
+  $\highlight[c3med!70]{\strut P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})}$ is the density weighted PDF\\[-0.1cm]
+  \mbox{\hphantom{$\highlight[c3med!70]{\strut P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})}$}} most models use $P(Z,c) = \beta-\beta/\beta-\delta$\\[0.5cm]
+  \mbox{\textbf{Can we provide accurate PDF models using machine learning?}}
+}
+
+% ================================================================================
+% DNS
+\frame{
+  \frametitle{A data snapshot at $t=0.0626\unit{s}$ of the Low Swirl Burner DNS was used for ML training.}
+  \vspace*{0.2cm}
+  \structure{Reacting flow DNS details}\\
+  \hspace*{0.5cm}LMC code with adaptive mesh refinement (LBNL)\\
+  \hspace*{0.5cm}3 levels of refinement (finest $\Delta x \approx 0.1\unit{mm}$)\\
+  \hspace*{0.5cm}DRM 19 chemical mechanism for finite rate kinetics\\[0.1cm]
+  \hspace{0.5cm}\begin{minipage}[c]{0.3\textwidth}%
+    \begin{center}%
+      \includegraphics[width=\textwidth]{./figs/lsb_nozzle.png}\\%
+      \includegraphics[width=\textwidth]{./figs/lsb_exp.png}
+    \end{center}%
+  \end{minipage}\hspace*{1.4cm}%
+  \begin{minipage}[c]{0.4\textwidth}%
+    \begin{center}%
+      \includegraphics[width=\textwidth]{./figs/lsb_dns.png}
+    \end{center}%
+  \end{minipage}%
+  \begin{textblock*}{100mm}(0.83\paperwidth,.5\paperheight)%
+    {\scriptsize $p=1\unit{atm}$\\%
+      Burner: CH4/air\\
+      Co-flow: air\\
+      $\Phi = 0.7$\par}
+  \end{textblock*}
+  \begin{textblock*}{100mm}(0.49\paperwidth,.92\paperheight)%
+    {\tiny \color{white} Contours of $T~[\unit{K}]$\\%
+      iso-surface of $\dot{\omega}$ (blue)\par}
+  \end{textblock*}
+  \begin{textblock*}{100mm}(0.6cm,.945\paperheight)%
+    {\tiny M. Day et. al, Combust. Flame 159 (1) (2012) 275–290\\%
+      Cheng, R. K., P. Combust. Inst. 28.1 (2000): 1305-1313\par}
+  \end{textblock*}
+}
+
+\frame{
+  \frametitle{The data for ML training is extracted from the LSB DNS.}
+  \vspace*{0.4cm}
+  Sub-volumes equi-spaced in DNS ($1146 \times 1146 \times 51$ cells)\\
+  Box filter with $\ol{\Delta} = 32 \Delta x$, spaced at $8\Delta x$ in each sub-volume\\[0.2cm]
+  \begin{center}
+    \includegraphics[width=0.9\textwidth]{./figs/gen_data.pdf}  
+  \end{center}
+
+}
+
+\frame{
+  \frametitle{Distribution of sample moments (ML inputs) illustrate the two different burning regimes ($\mathcal{V}_3$, $z_3=0.0775\unit{m}$).}
+  \vspace*{0.5cm}
+  Premixed burning of the fuel-air from the nozzle $\wt{Z}=1$ and $\wt{c} = 0.2$\\
+  Non-premixed burning of the products (intermediate $\wt{Z}$ and $\wt{c}$)
+  \begin{figure}%
+    \centering%
+    \includegraphics[page=1, height=0.5\textwidth, trim=0.0cm 0cm 6.4cm 0cm, clip]{./figs/inputs_dice_0004.pdf}%
+    \includegraphics[page=2, height=0.5\textwidth, trim=1.0cm 0cm 2.4cm 0cm, clip]{./figs/inputs_dice_0004.pdf}
+  \end{figure}%
+}
+
+\frame{
+  \frametitle{Examples of $P(Z,c)$ and $\langle \dot{\omega} | Z, c \rangle$ for increasing $\wt{\dot{\omega}}$ illustrate the wide range of observed shapes.}
+  \begin{figure}[!tbp]%
+    \centering%
+    \begin{subfigure}[t]{0.48\textwidth}%
+      \includegraphics[page=9,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+      %\caption{Marginal $P(Z,c)$ as a function of $Z$.}%
+    \end{subfigure}\hfill%
+    \begin{subfigure}[t]{0.48\textwidth}%
+      \includegraphics[page=10,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+      %\caption{Marginal $P(Z,c)$ as a function of $c$.}%
+    \end{subfigure}\\%
+    \begin{subfigure}[t]{0.48\textwidth}%
+      \includegraphics[page=11,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+      %\caption{Marginal conditional means of $\dot{\omega}$ as a function of $Z$.}%
+    \end{subfigure}\hfill%
+    \begin{subfigure}[t]{0.48\textwidth}%
+      \includegraphics[page=12,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
+      % \caption{Marginal conditional means of $\dot{\omega}$ as a function of $c$.}%
+    \end{subfigure}%
+    \caption{Examples of $P(Z,c)$ and $\langle \dot{\omega} | Z, c \rangle$ for increasing $\wt{\dot{\omega}}$. Red solid: $\wt{\dot{\omega}} = 0$ ($\wt{Z} = 0$, $\wt{Z''} = 0$, $\wt{c} = 0$, $\wt{c''} = 0$); green dashed: $\wt{\dot{\omega}} = 0.03$ ($\wt{Z}  =0.4$, $\wt{Z''}=0.006$, $\wt{c}  =0.03$, $\wt{c''}=0.0006$); blue dash-dotted: $\wt{\dot{\omega}} = 7.4$ ($\wt{Z}  =0.7$, $\wt{Z''}=0.01$, $\wt{c}  =0.08$, $\wt{c''}=0.003$); orange short dashed: $\wt{\dot{\omega}} = 42.2$ ($\wt{Z}  =0.9$, $\wt{Z''}=0.003$, $\wt{c}  =0.12$, $\wt{c''}=0.005$).}\label{fig:pdfs}%
+\end{figure}%
+}
+
+% ================================================================================
+% ML methods
+\frame{
+  \frametitle{We evaluate different machine learning algorithms.}
+  \begin{minipage}[t]{0.32\textwidth}%
+    \begin{center}%
+      {\footnotesize \structure{Traditional ML}}\\%
+      \begin{figure}%
+        \includegraphics[height=0.6\textwidth]{./figs/rf.pdf}%
+      \end{figure}\vspace{-0.5cm}%
+      {\flushleft\footnotesize Random forests:\\%
+        \scriptsize\hspace*{0.2cm}estimators = 100\\%
+        \hspace*{0.2cm}depth = 30\par}%
+    \end{center}%
+  \end{minipage}\hfill\vrule width 0.2pt \hfill%
+  \begin{minipage}[t]{0.32\textwidth}%
+    \begin{center}%
+      {\footnotesize \structure{Deep learning}}\\%
+      \begin{figure}%
+        \includegraphics[height=0.6\textwidth]{./figs/dnn.pdf}%
+      \end{figure}\vspace{-0.5cm}%
+      {\flushleft\footnotesize Deep neural network:\\%
+        \scriptsize\hspace*{0.2cm}3 layers: $[ 256, 512, 2048]$\\%
+        \hspace*{0.2cm}Leaky ReLU activations\\%
+        \hspace*{0.2cm}Softmax output\\%
+        \hspace*{0.2cm}Binary cross-entropy loss\\%
+        \hspace*{0.2cm}500 epochs\\
+        \hspace*{0.2cm}ADAM optimizer\par%
+      }%
+    \end{center}%
+  \end{minipage}\hfill\vrule width 0.2pt \hfill%
+  \begin{minipage}[t]{0.32\textwidth}%
+    \begin{center}%
+      {\footnotesize \structure{Unsupervised, generative}}\\%      
+      \begin{figure}%
+        \includegraphics[height=0.6\textwidth]{./figs/cvae.pdf}%
+      \end{figure}\vspace{-0.5cm}%
+      {\flushleft \footnotesize Variational autoencoder:\\%
+        \scriptsize \hspace*{0.2cm}encoder: $[ 2048, 512, 256]$\\%
+        \hspace*{0.2cm}decoder: $[ 256, 512, 2048]$\\%
+        \hspace*{0.2cm}latent dimension: 10\\%
+        \hspace*{0.2cm}leaky ReLU activations\\%
+        \hspace*{0.2cm}softmax output\\%
+        \hspace*{0.2cm}BCE and KL div. loss\\%
+        \hspace*{0.2cm}500 epochs\\
+        \hspace*{0.2cm}ADAM optimizer\par%
+      }%
+    \end{center}%
+  \end{minipage}\\[0.5cm]%
+}
+
+
+% ================================================================================
+% Results
+\frame{
+  \frametitle{We evaluate different model development strategies using the following tests and metrics.}
+  \vspace*{0.3cm}
+  \structure{Model tests}\\
+  \hspace*{1cm}1. Trained and evaluated at $z=0.0775\unit{m}$\\
+  \hspace*{1cm}\mbox{2. Trained on every other volume, evaluated on other regions}\\[0.5cm]
+  \structure{Metric for $P(Z,c)$ (Jensen-Shannon divergence)}
+  \begin{align*}
+    &J(Q||R)= \frac{1}{2} \left( D(Q || M) + D(R || M)\right)\\
+    &\text{where }M = \nicefrac{1}{2}(Q+R) \quad\text{and } D(Q||R) = \sum_{i=1}^n R(i) \ln{\left( \nicefrac{R(i)}{Q(i)} \right)}
+  \end{align*}
+  \structure{Metric for $\wt{\dot{\omega}}$ (normalized RMSE)}
+  \begin{align*}
+    \text{RMSE}(\wt{\dot{\omega}}) = \frac{1}{\wt{\dot{\Omega}}}\sqrt{ \frac{1}{|\mathcal{D}|}\sum_{i=1}^{|\mathcal{D}|}\left( \epsilon(\wt{\dot{\omega}}_i) \right)^2}
+  \end{align*}
+  Metrics are evaluated on a validation set (not used for training).
+}
+
+\frame{
+  \frametitle{Machine learning models accurately capture the complexity in the PDFs.}
+  \begin{align*}
+    \setlength{\fboxsep}{4pt}
+    \wt{\dot{\omega}} = \int \langle \dot{\omega} | Z, c \rangle \ \highlight[c3med!70]{\strut P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})} \ud Z \ud c
+  \end{align*}
+  \begin{figure}%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/jsd_dice_0004.pdf}%
+    %\caption*{Probability density function of $J$.}\label{fig:jsd_pdf}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=2,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/jsd_dice_0004.pdf}%
+    %\caption*{Cumulative density function of $J$.}\label{fig:jsd_cdf}%
+  \end{subfigure}%
+  %\caption*{Red solid: RF; green dashed: DNN; blue dash-dotted: CVAE; orange short dashed: $\beta-\beta$ model.}\label{fig:jsd}%
+\end{figure}%
+}
+
+\frame{
+  \frametitle{Leading to accurate predictions of the filtered reaction rates using ML models.}
+  \begin{align*}
+    \setlength{\fboxsep}{4pt}
+    \highlight[c1med!70]{\wt{\dot{\omega}}} = \int \langle \dot{\omega} | Z, c \rangle P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''}) \ud Z \ud c
+  \end{align*}
+  \begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_dice_0004.pdf}%
+    %\caption*{$\wt{\dot{\omega}}$ predictions.}\label{fig:convolution_scatter}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=2,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_dice_0004.pdf}%
+    %\caption*{PDF of $\epsilon(\wt{\dot{\omega}})$.}\label{fig:convolution_pdf}%
+  \end{subfigure}%
+  %\caption*{Red squares and solid: RF; green diamonds and dashed: DNN; blue circles and dash-dotted: CVAE; orange pentagons and short dashed: $\beta-\beta$ model.}\label{fig:convolution}%
+\end{figure}%
+}
+
+\frame{
+  \frametitle{ML models achieve similar performance but the RF model is large and exhibits high evaluation times.}
+  \begin{center}
+    \begin{tabular}{lccccc}
+      \toprule
+      model & $J_{90}$ & $t_m~[\unit{ms}]$ & RMSE$(\wt{\dot{\omega}})$& $R^2(\wt{\dot{\omega}})$ & Size (MB)\\
+      \midrule
+      RF            & 0.12 & 0.932 & 0.22 & 0.97 & 82107 \\
+      DNN           & 0.11 & 0.036 & 0.23 & 0.97 & 27    \\
+      CVAE          & 0.12 & 0.038 & 0.22 & 0.97 & 36    \\
+      $\beta-\beta$ & 0.35 & 1.178 & 0.63 & 0.75 & {--}  \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \vspace*{0.5cm}
+  {\footnotesize $J_{90}$ is the $90^\text{th}$ percentile of $J(P||P_m)$\\
+  $t_m = \frac{1}{n_t |\mathcal{D}_3^v|} \sum_{i=1}^{n_t} \text{time to evaluate } m(\mathcal{D}_3^v)$\\
+  \mbox{$\beta-\beta$ model evaluated using SciPy, RF with scikit-learn, DNN/CVAE with PyTorch}}\par
+}
+
+\frame{
+  \frametitle{ML models are able to interpolate to other regions of the domain (trained on every other region).}
+  Training data: $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$\\[0.3cm]
+  Validation data: $\mathcal{D}_i^v,\ i=1, \dots, 9$
+  \begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth]{./figs/dice_predictions_skip.pdf}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=2,width=\textwidth]{./figs/dice_predictions_skip.pdf}%
+  \end{subfigure}%
+\end{figure}%
+}
+
+% ================================================================================
+% Conclusions
+\frame{
+  \frametitle{Deep learning algorithms achieve high accuracy and low model costs.}
+  \vspace*{0.3cm}
+  \structure{We explored different ML techniques for PDF modeling}\\
+  \hspace*{1cm}Traditional ensemble methods (random forests)\\
+  \hspace*{1cm}Deep learning methods (fully connected deep neural network)\\
+  \hspace*{1cm}Unsupervised, generative learning (variational autoencoder)\\[0.3cm]
+  \structure{Results show that, for this study,}\\
+  \hspace{1cm}ML models accurately capture PDF complexity\\
+  \hspace{1cm}DL models are accurate, are fast predictors, and are small\\
+  \hspace{1cm}Generative learning do not present an advantage\\
+  \hspace{1cm}Analytical models present reduced accuracy\\[0.3cm]
+  \structure{Future work:} \textit{a-posteriori} testing and extend to different flames\\[0.3cm]
+  %\structure{Full paper can be found at URL}\\[0.3cm]
+  {\tiny\textit{This research was supported by the Exascale Computing Project (ECP), Project Number: 17-SC-20-SC, a collaborative effort of two DOE organizations -- the Office of Science and the National Nuclear Security Administration -- responsible for the planning and preparation of a capable exascale ecosystem -- including software, applications, hardware, advanced system engineering, and early testbed platforms -- to support the nation's exascale computing imperative.}\par}
+}
+
+% % =================================================================================
+% % Bibliography
+% \begin{frame}[allowframebreaks,plain]{Bibliography}
+%   \tiny
+%   \bibliographystyle{model1-num-names}
+%   %\bibliographystyle{jap}
+%   %\bibliography{./library}
+% \end{frame}
+
+\egroup
+
+\end{document}
