@@ -18,7 +18,7 @@ $ pipenv install
 @article{Henrydefrahan2018,
     author    = {Henry de Frahan, M. T. and Yellapantula, S. and King, R. and Day, M. and Grout, R.},
     title     = {Deep learning for presumed probability density function models},
-    journal   = {arXiv:},
+    journal   = {arXiv:1901.05557},
     year      = {2019}
 }
 ```
