@@ -247,7 +247,7 @@ def deprecated_gen_conditional_means_dice(df, zbin_edges, cbin_edges, oname):
     # Plot
     ma_means = np.ma.array(means, mask=np.isnan(means))
     cm = matplotlib.cm.viridis
-    cm.set_bad("white", 1.)
+    cm.set_bad("white", 1.0)
     plt.figure(0)
     plt.clf()
     im = plt.imshow(
@@ -429,7 +429,7 @@ def src_pv_normalization(
     datadir="data",
 ):
     """Compute the normalization constant"""
-    src_pv_sum = 0.
+    src_pv_sum = 0.0
     count = 0
     for dice in dices:
         pdf = pd.read_pickle(os.path.join(datadir, f"{dice}_pdfs.gz"))
@@ -612,7 +612,7 @@ def rf_training(Xtrain, Xdev, Ytrain, Ydev, nestim=100, max_depth=30):
     # Setup
     model_name = "RF"
     logdir = create_logdir(model_name)
-    np.random.seed(985721)
+    np.random.seed(985_721)
 
     # Training
     start = time.time()
@@ -713,7 +713,7 @@ class AnalyticalPDFModel:
         self.zbin_centers = utilities.edges_to_midpoint(zbin_edges)
         self.cbin_widths = np.diff(cbin_edges)
         self.zbin_widths = np.diff(zbin_edges)
-        self.seed = 9023457
+        self.seed = 9_023_457
 
 
 # ========================================================================
@@ -980,7 +980,7 @@ def cgan_training(Xtrain, Xdev, Ytrain, Ydev, use_gpu=False):
     nsample_noise = 10
     noise_size = 100
     nlabels = Xtrain.shape[1]
-    torch.manual_seed(5465462)
+    torch.manual_seed(5_465_462)
 
     # Construct the G and D models
     D = Discriminator().to(device=device, dtype=dtype)
@@ -1278,7 +1278,7 @@ def cvae_training(Xtrain, Xdev, Ytrain, Ydev, use_gpu=False):
     encoder_layer_sizes = [input_size + nlabels, 512, 256]
     latent_size = 10
     decoder_layer_sizes = [256, 512, input_size]
-    torch.manual_seed(5465462)
+    torch.manual_seed(5_465_462)
 
     # The number of times entire dataset is trained
     nepochs = 500
@@ -1477,7 +1477,7 @@ def dnn_training(Xtrain, Xdev, Ytrain, Ydev, use_gpu=False):
     batch_size = 64
     input_size = Xtrain.shape[1]
     layer_sizes = [256, 512, Ytrain.shape[1]]
-    torch.manual_seed(5465462)
+    torch.manual_seed(5_465_462)
 
     # Construct the NN model
     model = Net(input_size, layer_sizes, vh).to(device=device, dtype=dtype)
@@ -1642,6 +1642,61 @@ def predict_all_dice(model, model_scaler, datadir="data", half=False):
 
 
 # ========================================================================
+def predict_full_dices(
+    model,
+    model_scaler,
+    dices=[
+        "dice_0002",
+        "dice_0003",
+        "dice_0004",
+        "dice_0005",
+        "dice_0006",
+        "dice_0007",
+        "dice_0008",
+        "dice_0009",
+        "dice_0010",
+    ],
+    datadir="data",
+    half=False,
+):
+    """
+    Predict on all data from all dices
+    """
+    lst = []
+
+    for dice in dices:
+        print(f"Predicting model on {dice}")
+
+        # Load data
+        pdf = pd.read_pickle(os.path.join(datadir, f"{dice}_pdfs.gz"))
+        means = pd.read_pickle(os.path.join(datadir, f"{dice}_src_pv_means.gz"))
+        X = pd.DataFrame(
+            model_scaler.transform(pdf[get_xnames()]),
+            index=pdf.index,
+            columns=get_xnames(),
+        )
+
+        # Prediction
+        mpred = model.predict(X)
+
+        # Perform convolution and save data
+        df = pd.DataFrame(
+            {
+                "xc": pdf.xc,
+                "yc": pdf.yc,
+                "zc": pdf.zc,
+                "exact": pdf.SRC_PV,
+                "model": convolution_means(mpred, means),
+            },
+            index=pdf.index,
+        )
+        df["dice"] = dice
+        lst.append(df)
+
+    return pd.concat(lst)
+
+
+# ========================================================================
 def lrp_all_dice(DNN, model_scaler, datadir="data"):
     """
     Calculate DNN LRP on data from all dices
@@ -1746,7 +1801,7 @@ def shuffled_input_loss(model, X, Y):
 
     dic = {}
     metric = "rmse"
-    np.random.seed(985721)
+    np.random.seed(985_721)
     dic["original"] = loss(Y, model.predict(X), metric=metric)
     for col in X:
 

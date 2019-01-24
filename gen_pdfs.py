@@ -84,6 +84,43 @@ def load_raw_pdf_data(fname):
 
 
 # ========================================================================
+def concatenate_dices(dices=["dice_0000", "dice_0001"], datadir="data"):
+    """
+    Concatenate dices
+
+    :param dices: list of dice names
+    :type dices: list
+    :param datadir: directory containing dices
+    :type datadir: str
+    """
+
+    # Setup
+    fields_load = ["Rho", "Z", "C", "SRC_PV", "Temp"]
+    oname = os.path.join(datadir, "concatenated.npz")
+    dats = [np.load(os.path.join(datadir, f"{dice}.npz")) for dice in dices]
+
+    # Get data
+    fdir = dats[0]["fdir"]
+    z = np.mean([dat["z"] for dat in dats])
+    dx = dats[0]["dx"]
+    low = dats[0]["low"]
+    high = dats[-1]["high"]
+
+    fields_save = dict(
+        zip(
+            fields_load,
+            [
+                np.concatenate([dat[field] for dat in dats], axis=-1)
+                for field in fields_load
+            ],
+        )
+    )
+
+    # Save
+    np.savez_compressed(oname, fdir=fdir, z=z, dx=dx, low=low, high=high, **fields_save)
+
+
+# ========================================================================
 def gen_pdf_from_dice(fname):
     """
     Generate PDFs from a dice of data
