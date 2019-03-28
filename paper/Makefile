@@ -15,4 +15,4 @@ $(FNAME).pdf: $(FNAME).tex
 	pdflatex $(FNAME);
 
 clean:
-	-rm -f $(FNAME).pdf *.aux *.nav *.log *.lof *.lot *.out *.snm *.blg *.bbl *.toc *.vrb *.dvi *.spl *.ps *.xml *.upa *.upb;
+	-rm -f $(FNAME).pdf *.aux *.acn *.glo *.ist *.nav *.log *.lof *.lot *.out *.snm *.blg *.bbl *.toc *.vrb *.dvi *.spl *.ps *.xml *.upa *.upb;
