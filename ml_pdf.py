@@ -2134,11 +2134,11 @@ def plot_input_space(pdfs, fname="inputs.pdf"):
         axhx = plt.axes(rect_histx)
 
         # Scatter plot
-        im = axs0.scatter(x, y, c=pdfs.Zvar, marker=".", alpha=0.1, cmap="viridis")
+        im = axs0.scatter(x, y, c=pdfs.Zvar, marker=".", alpha=0.1, cmap="viridis", rasterized=True)
         cbar = plt.colorbar(im, ax=axs0)
-        cbar.ax.set_title(r"$\widetilde{Z''}$")
+        cbar.ax.set_title(r"$\widetilde{Z''}$", fontsize=28)
         cbar.set_alpha(1.0)
-        cbar.ax.tick_params(labelsize=18)
+        cbar.ax.tick_params(labelsize=22)
         cbar.draw_all()
 
         # Histogram on top (resize because of colorbar)
@@ -2146,17 +2146,17 @@ def plot_input_space(pdfs, fname="inputs.pdf"):
         axhx.tick_params(
             axis="both", which="both", bottom=False, top=False, labelbottom=False
         )
-        axhx.set_ylabel(r"$P(\widetilde{Z})$", fontsize=22)
-        plt.setp(axhx.get_ymajorticklabels(), fontsize=18)
+        axhx.set_ylabel(r"$P(\widetilde{Z})$", fontsize=28)
+        plt.setp(axhx.get_ymajorticklabels(), fontsize=22)
         pos_s0 = axs0.get_position()
         pos_hx = axhx.get_position()
         axhx.set_position([pos_s0.x0, pos_hx.y0, pos_s0.width, pos_hx.height])
 
-        axs0.set_xlabel(r"$\widetilde{Z}$", fontsize=22, fontweight="bold")
-        axs0.set_ylabel(r"$\widetilde{c}$", fontsize=22, fontweight="bold")
-        plt.setp(axs0.get_xmajorticklabels(), fontsize=18, fontweight="bold")
-        plt.setp(axs0.get_ymajorticklabels(), fontsize=18, fontweight="bold")
-        pdf.savefig(dpi=300)
+        axs0.set_xlabel(r"$\widetilde{Z}$", fontsize=28)
+        axs0.set_ylabel(r"$\widetilde{c}$", fontsize=28)
+        plt.setp(axs0.get_xmajorticklabels(), fontsize=22)
+        plt.setp(axs0.get_ymajorticklabels(), fontsize=22)
+        pdf.savefig(dpi=150)
 
         # Second figure
         rect_histy = [left + pos_s0.width + pad, bottom, hist_height, height]
@@ -2166,7 +2166,7 @@ def plot_input_space(pdfs, fname="inputs.pdf"):
         axhy = plt.axes(rect_histy)
 
         # Scatter plot
-        im = axs1.scatter(x, y, c=pdfs.Cvar, marker=".", alpha=0.1, cmap="viridis")
+        im = axs1.scatter(x, y, c=pdfs.Cvar, marker=".", alpha=0.1, cmap="viridis", rasterized=True)
         axs1.tick_params(axis="both", which="both", left=False, labelleft=False)
         pos_s1 = axs1.get_position()
         axs1.set_position([pos_s0.x0, pos_s1.y0, pos_s0.width, pos_s1.height])
@@ -2183,22 +2183,22 @@ def plot_input_space(pdfs, fname="inputs.pdf"):
             labelbottom=True,
             labelleft=False,
         )
-        axhy.set_xlabel(r"$P(\widetilde{c})$", fontsize=22)
-        plt.setp(axhy.get_xmajorticklabels(), fontsize=18)
+        axhy.set_xlabel(r"$P(\widetilde{c})$", fontsize=28)
+        plt.setp(axhy.get_xmajorticklabels(), fontsize=22)
         pos_hy = axhy.get_position()
         axhy.set_position([pos_hy.x0, pos_hy.y0, pos_hx.height, pos_hy.height])
 
         # Then colorbar
         cbar = plt.colorbar(im, ax=axhy)
-        cbar.ax.set_title(r"$\widetilde{c''}$")
+        cbar.ax.set_title(r"$\widetilde{c''}$", fontsize=28)
         cbar.set_alpha(1.0)
-        cbar.ax.tick_params(labelsize=18)
+        cbar.ax.tick_params(labelsize=22)
         cbar.draw_all()
 
-        axs1.set_xlabel(r"$\widetilde{Z}$", fontsize=22, fontweight="bold")
-        plt.setp(axs1.get_xmajorticklabels(), fontsize=18, fontweight="bold")
-        plt.setp(axs1.get_ymajorticklabels(), fontsize=18, fontweight="bold")
-        pdf.savefig(dpi=300)
+        axs1.set_xlabel(r"$\widetilde{Z}$", fontsize=28)
+        plt.setp(axs1.get_xmajorticklabels(), fontsize=22)
+        plt.setp(axs1.get_ymajorticklabels(), fontsize=22)
+        pdf.savefig(dpi=150)
 
         # Third figure
         rect_scatter = [left, bottom, width, height]
@@ -2207,18 +2207,18 @@ def plot_input_space(pdfs, fname="inputs.pdf"):
         axs0 = plt.axes(rect_scatter)
 
         # Scatter plot
-        im = axs0.scatter(x, y, c=pdfs.SRC_PV, marker=".", alpha=0.1, cmap="viridis")
+        im = axs0.scatter(x, y, c=pdfs.SRC_PV, marker=".", alpha=0.1, cmap="viridis", rasterized=True)
         cbar = plt.colorbar(im, ax=axs0)
-        cbar.ax.set_title(r"$\widetilde{\dot{\omega}}$")
+        cbar.ax.set_title(r"$\widetilde{\dot{\omega}}$", fontsize=28)
         cbar.set_alpha(1.0)
-        cbar.ax.tick_params(labelsize=18)
+        cbar.ax.tick_params(labelsize=22)
         cbar.draw_all()
 
-        axs0.set_xlabel(r"$\widetilde{Z}$", fontsize=22, fontweight="bold")
-        axs0.set_ylabel(r"$\widetilde{c}$", fontsize=22, fontweight="bold")
-        plt.setp(axs0.get_xmajorticklabels(), fontsize=18, fontweight="bold")
-        plt.setp(axs0.get_ymajorticklabels(), fontsize=18, fontweight="bold")
-        pdf.savefig(dpi=300)
+        axs0.set_xlabel(r"$\widetilde{Z}$", fontsize=28)
+        axs0.set_ylabel(r"$\widetilde{c}$", fontsize=28)
+        plt.setp(axs0.get_xmajorticklabels(), fontsize=22)
+        plt.setp(axs0.get_ymajorticklabels(), fontsize=22)
+        pdf.savefig(dpi=150)
 
 
 # ========================================================================
@@ -2487,10 +2487,11 @@ def plot_dice_slices(fname):
         for i, field in enumerate(fields):
             fig, (ax0) = plt.subplots(1)
             im0 = ax0.imshow(
-                field["field"], origin="lower", extent=extent, aspect="equal"
+                field["field"], origin="lower", extent=extent, aspect="equal", vmin=0.0
             )
             cbar = plt.colorbar(im0, ax=ax0)
-            cbar.ax.set_title(f"""{field["label"]}""")
+            cbar.ax.set_title(f"""{field["label"]}""", fontsize=22)
+            cbar.ax.tick_params(labelsize=18)
             ax0.set_xlabel(r"$x~[\mathrm{m}]$", fontsize=22, fontweight="bold")
             ax0.set_ylabel(r"$y~[\mathrm{m}]$", fontsize=22, fontweight="bold")
             ticks = [-0.06, 0, 0.06]

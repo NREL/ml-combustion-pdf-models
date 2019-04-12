@@ -67,7 +67,9 @@ def plot_dns(fdir):
         cbar = plt.colorbar(
             im, ax=ax0, ticks=SymmetricalLogLocator(linthresh=linthresh, base=10)
         )
-        cbar.ax.set_title(r"$\dot{\omega}$")
+        cbar.ax.set_title(r"$\dot{\omega}$", fontsize=22)
+        cbar.ax.tick_params(labelsize=18)
+        plt.setp(cbar.ax.get_yticklabels()[3], visible=False)
 
         for zloc in zlocs:
             ax0.plot(
@@ -78,12 +80,11 @@ def plot_dns(fdir):
                 ls="--",
             )
 
-        ax0.set_xlabel(r"$y~[\mathrm{m}]$", fontsize=22, fontweight="bold")
-        ax0.set_ylabel(r"$z~[\mathrm{m}]$", fontsize=22, fontweight="bold")
+        ax0.set_xlabel(r"$y~[\mathrm{m}]$", fontsize=22)
+        ax0.set_ylabel(r"$z~[\mathrm{m}]$", fontsize=22)
         plt.setp(ax0.get_xmajorticklabels(), fontsize=18)
         plt.setp(ax0.get_ymajorticklabels(), fontsize=18)
-        fig0.subplots_adjust(bottom=0.15)
-        fig0.subplots_adjust(left=0.17)
+        fig0.tight_layout()
         pdf.savefig(dpi=300)
 
         # Get slices in z
@@ -115,14 +116,15 @@ def plot_dns(fdir):
             cbar = plt.colorbar(
                 im, ax=ax0, ticks=SymmetricalLogLocator(linthresh=linthresh, base=10)
             )
-            cbar.ax.set_title(r"$\dot{\omega}$")
+            cbar.ax.set_title(r"$\dot{\omega}$", fontsize=22)
+            cbar.ax.tick_params(labelsize=18)
+            plt.setp(cbar.ax.get_yticklabels()[3], visible=False)
 
             ax0.set_xlabel(r"$x~[\mathrm{m}]$", fontsize=22, fontweight="bold")
             ax0.set_ylabel(r"$y~[\mathrm{m}]$", fontsize=22, fontweight="bold")
             plt.setp(ax0.get_xmajorticklabels(), fontsize=18)
             plt.setp(ax0.get_ymajorticklabels(), fontsize=18)
-            fig0.subplots_adjust(bottom=0.15)
-            fig0.subplots_adjust(left=0.17)
+            fig0.tight_layout()
             pdf.savefig(dpi=300)
 
 
@@ -180,10 +182,10 @@ def plot_dns_with_dices(fdir):
             orientation="horizontal",
         )
         cax0.xaxis.set_ticks_position("top")
-        cax0.tick_params(axis="both", which="major", labelsize=6)
+        cax0.tick_params(axis="both", which="major", labelsize=18)
         for label in cax0.xaxis.get_ticklabels()[::2]:
             label.set_visible(False)
-        cax0.set_title(r"$\dot{\omega}$")
+        cax0.text(1.05, 0.3, r"$\dot{\omega}$", fontsize=22)
 
         for i, zloc in enumerate(zlocs):
             zc = zloc - 0.5 * dh
@@ -215,3 +217,59 @@ def plot_dns_with_dices(fdir):
         fig0.subplots_adjust(left=0.17)
 
         pdf.savefig(dpi=300)
+
+
+# ========================================================================
+def plot_c_comp(fdir):
+
+    # Load the data
+    ds = yt.load(fdir, unit_system="mks")
+
+    # Setup
+    L = (ds.domain_right_edge - ds.domain_left_edge).d
+    width = L[0]
+    res = 512
+
+    fname = "c_comp.pdf"
+    with PdfPages(fname) as pdf:
+
+        fields = ["C", "Temp"]
+        labels = [r"$c$", r"$c_T$"]
+        for k, field in enumerate(fields):
+            plt.close("all")
+            plt.rc("text", usetex=True)
+
+            # Get a slice in x of C
+            slc = yt.SlicePlot(ds, "x", fields=[field])
+            frb = slc.data_source.to_frb(width, res)
+            x_slc = np.array(frb[field])
+
+            if field == "Temp":
+                T0 = 300
+                Tc = 2260 # adiabatic flame temperature
+                x_slc = (x_slc - T0) / (Tc - T0)
+
+            fig0 = plt.figure(0)
+            ax0 = fig0.add_subplot(111)
+            im = ax0.imshow(
+                x_slc,
+                origin="lower",
+                extent=[
+                    ds.domain_left_edge.d[0],
+                    ds.domain_right_edge.d[0],
+                    ds.domain_left_edge.d[2],
+                    ds.domain_right_edge.d[2],
+                ],
+                aspect="equal",
+                cmap="viridis",
+            )
+            cbar = plt.colorbar(im, ax=ax0)
+            cbar.ax.set_title(labels[k], fontsize=22)
+            cbar.ax.tick_params(labelsize=18)
+
+            ax0.set_xlabel(r"$y~[\mathrm{m}]$", fontsize=22)
+            ax0.set_ylabel(r"$z~[\mathrm{m}]$", fontsize=22)
+            plt.setp(ax0.get_xmajorticklabels(), fontsize=18)
+            plt.setp(ax0.get_ymajorticklabels(), fontsize=18)
+            fig0.tight_layout()
+            pdf.savefig(dpi=300)
