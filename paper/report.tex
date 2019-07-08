@@ -336,12 +336,6 @@ dimension. The DRM 19 chemical mechanism was used to model the finite
 rate kinetics~\cite{Kazakov1994}. The domain pressure is
 $1\,\unit{atm}$. The physical characteristics and the mechanisms behind the flame are discussed in detail by~\citet{Day2012} and will not be described here for brevity. 
 
-\begin{figure}[!tbp]%
-  \centering%
-  \includegraphics[width=0.5\textwidth]{./figs/exp_lsb.png}\\%
-  \caption{Lifted flame of the low-swirl burner from the experimental configuration. From \citet{Day2012}. \copyright{} Elsevier. Reproduced with permission.}\label{fig:exp_lsb}%
-\end{figure}%
-
 In the current analysis, the mixture fraction, $Z$, is computed
 through a linear combination of the nitrogen mass fraction in the
 burner exit stream and the co-flow and it is normalized such that it
@@ -380,61 +374,6 @@ configuration considered in this study. Additional advantages of using
 data from multiple burning regimes for training \gls{ml} models include
 using of more diverse training data, avoiding overfitting, and
 increasing the opportunities for model generalization.
-
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=1,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figs/src_pv.pdf}%
-    \caption{$x=0\,\unit{m}$.}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=2,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figs/src_pv.pdf}%
-    \caption{$z=0.0525\,\unit{m}$ (center height of $\mathcal{V}_{1}$).}%
-  \end{subfigure}\\%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=3,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figs/src_pv.pdf}%
-    \caption{$z=0.0775\,\unit{m}$ (center height of $\mathcal{V}_{3}$).}%
- \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=4,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figs/src_pv.pdf}%
-    \caption{$z=0.1025\,\unit{m}$ (center height of $\mathcal{V}_{5}$).}%
-  \end{subfigure}\\%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=5,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figs/src_pv.pdf}%
-    \caption{$z=0.1275\,\unit{m}$ (center height of $\mathcal{V}_{7}$).}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=6,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figs/src_pv.pdf}%
-    \caption{$z=0.14\,\unit{m}$ (center height of $\mathcal{V}_{9}$).}%
-  \end{subfigure}
-  \caption{Slices of $\dot{\omega}$ in \gls{dns}. White dashed lines: $z$ locations of slices shown in (b)--(f).}\label{fig:dns}%
-\end{figure}%
-
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=1,width=\textwidth, trim=0.4cm 0cm 1.4cm 0cm, clip=true]{./figs/dice_0004_slice.pdf}%
-    \caption{$\wt{Z}$.}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=2,width=\textwidth, trim=0.4cm 0cm 1.4cm 0cm, clip=true]{./figs/dice_0004_slice.pdf}%
-    \caption{$\wt{Z''}$.}%
-  \end{subfigure}\\%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=3,width=\textwidth, trim=0.4cm 0cm 1.4cm 0cm, clip=true]{./figs/dice_0004_slice.pdf}%
-    \caption{$\wt{c}$.}%
- \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=4,width=\textwidth, trim=0.4cm 0cm 1.4cm 0cm, clip=true]{./figs/dice_0004_slice.pdf}%
-    \caption{$\wt{c''}$.}%
-  \end{subfigure}
-  % \\%
-  % \begin{subfigure}[t]{0.48\textwidth}%
-  %   \includegraphics[page=5,width=\textwidth]{./figs/dice_0004_slice.pdf}%
-  %   \caption{$\wt{\dot{\omega}}$.}%
-  % \end{subfigure}
-  \caption{Slices of filtered \gls{dns} data at $z=0.0775\,\unit{m}$ (center height of $\mathcal{V}_3$).}\label{fig:slices}%
-\end{figure}%
 
 \subsection{Generation of the modeling data}\label{sec:gen}
 
@@ -505,56 +444,6 @@ burning of the mixed products. As $\wt{\dot{\omega}}$ increases, the
 location of the peak of $P(Z, c)$ increases in the $Z$ and $c$ space
 because reactions happen at higher $Z$ and $c$.
 
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=9,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.1cm, clip=true]{./figs/pdfs_dice_0004.pdf}%
-    \caption{Marginal $P(Z,c)$ as a function of $Z$.}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=10,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.1cm, clip=true]{./figs/pdfs_dice_0004.pdf}%
-    \caption{Marginal $P(Z,c)$ as a function of $c$.}%
-  \end{subfigure}\\%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=11,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.1cm, clip=true]{./figs/pdfs_dice_0004.pdf}%
-    \caption{Marginal conditional means of $\dot{\omega}$ as a function of $Z$.}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=12,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.1cm, clip=true]{./figs/pdfs_dice_0004.pdf}%
-    \caption{Marginal conditional means of $\dot{\omega}$ as a function of $c$.}%
-  \end{subfigure}%
-  \caption{Examples of $P(Z,c)$ and $\langle \dot{\omega} | Z, c \rangle$ for increasing $\wt{\dot{\omega}}$. Red solid: $\wt{\dot{\omega}} = 0$ ($\wt{Z} = 0$, $\wt{Z''} = 0$, $\wt{c} = 0$, $\wt{c''} = 0$); green dashed: $\wt{\dot{\omega}} = 0.03$ ($\wt{Z}  =0.4$, $\wt{Z''}=0.006$, $\wt{c}  =0.03$, $\wt{c''}=0.0006$); blue dash-dotted: $\wt{\dot{\omega}} = 7.4$ ($\wt{Z}  =0.7$, $\wt{Z''}=0.01$, $\wt{c}  =0.08$, $\wt{c''}=0.003$); orange short dashed: $\wt{\dot{\omega}} = 42.2$ ($\wt{Z}  =0.9$, $\wt{Z''}=0.003$, $\wt{c}  =0.12$, $\wt{c''}=0.005$).}\label{fig:pdfs}%
-\end{figure}%
-% \begin{figure}[!tbp]%
-%   \centering%
-%   \begin{subfigure}[t]{0.48\textwidth}%
-%     \includegraphics[page=1,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
-%     % \caption{$\wt{Z}=0.0$, $\wt{Z''}=0.0$, $\wt{c}=0.0$, $\wt{c''}=0.0$, and $\wt{\omega}=0.0$.}%
-%     \caption{$\left[ \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''}, \wt{\omega} \right] = 0.0$.}%
-%   \end{subfigure}\hfill%
-%   \begin{subfigure}[t]{0.48\textwidth}%
-%     \includegraphics[page=2,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
-%     \caption{$\left[0.400, 0.007, 0.027, 0.001, 0.009\right]$.}%
-%   \end{subfigure}\\%
-%   \begin{subfigure}[t]{0.48\textwidth}%
-%     \includegraphics[page=3,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
-%     \caption{$\left[0.626, 0.013, 0.032, 0.002, 0.999 \right]$.}%
-%   \end{subfigure}\hfill%
-%   \begin{subfigure}[t]{0.48\textwidth}%
-%     \includegraphics[page=4,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
-%     \caption{$\left[0.671, 0.013, 0.082, 0.003, 1.836 \right]$.}%
-%   \end{subfigure}\\%
-%   \begin{subfigure}[t]{0.48\textwidth}%
-%     \includegraphics[page=5,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
-%     \caption{$\left[0.800, 0.010, 0.050, 0.003, 4.1 \right]$.}%
-%   \end{subfigure}\hfill%
-%   \begin{subfigure}[t]{0.48\textwidth}%
-%     \includegraphics[page=6,width=\textwidth]{./figs/pdfs_dice_0004.pdf}%
-%     \caption{$\left[0.925, 0.004, 0.121, 0.005, 13.9 \right]$.}%
-%   \end{subfigure}%
-%   \caption{Sub-filter \glspl{pdf} in $\mathcal{V}_3$ (centered at $z=0.0775\,\unit{m}$) with increasing $\wt{\dot{\omega}}$.}\label{fig:pdfs}%
-% \end{figure}%
-
 Figure\,\ref{fig:inputs} illustrates the distribution of moments,
 $\left[\wt{Z}, \wt{Z''}, \wt{c}, \wt{c''}\right]$, across the samples
 in $\mathcal{V}_3$. Most \glspl{fdf} are associated with fully burned
@@ -566,13 +455,6 @@ however, are associated with intermediate states spanning the full
 range of $\wt{Z}$ and $\wt{c}$ with larger $\wt{Z''}$ and $\wt{c''}$
 because of the burning of the products from the primary premixed flame
 zone mixed with the air from the co-flow. 
-
-\begin{figure}[!tbp]%
-  \centering%
-  \includegraphics[page=1, height=0.49\textwidth, trim=0.0cm 0cm 6.cm 0cm, clip]{./figs/inputs_dice_0004.pdf}\hfill%
-  \includegraphics[page=2, height=0.49\textwidth, trim=1.8cm 0cm 1.8cm 0cm, clip]{./figs/inputs_dice_0004.pdf}%
-  \caption{Scatter plots of moments $\wt{Z}$ and $\wt{c}$ for samples in $\mathcal{V}_3$ (centered at $z=0.0775\,\unit{m}$) colored by $\wt{Z''}$ (left) and $\wt{c''}$ (right) with associated marginal distributions.}\label{fig:inputs}%
-\end{figure}%
 
 \subsection{Machine learning algorithms}\label{sec:methods}
 In this work, we evaluate the performance and suitability of three
@@ -610,12 +492,6 @@ outliers~\cite{Pedregosa2011}. A separate scaling was computed for
 each training data set and applied to the associated validation data
 set. The evaluation of a model $m$ on a data set $\mathcal{D}$ is
 denoted $m(\mathcal{D})$.
-
-\begin{figure}[!tbp]%
-  \centering%
-  \includegraphics[width=0.9\textwidth]{./figs/gen_data.pdf}\\%
-  \caption{Illustration of data generation procedure for $\mathcal{V}_5$.}\label{fig:gen_data}%
-\end{figure}%
 
 The first of the investigated models, random forests (RF), is an
 ensemble model that creates ensembles of low-bias/high-variance
@@ -775,21 +651,6 @@ decoder part of the \gls{cvae}. The network was implemented in
 Pytorch~\cite{Paszke2017} and trained on a single NVIDIA Tesla K80
 GPU.
 
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \centering
-    \includegraphics[width=0.85\textwidth]{./figs/rf.pdf}%
-    \caption{Decision tree with a tree depth of 3. Green boxes: decision nodes with conditions on the input variables; blue boxes: leaves with output values.}\label{fig:rf}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \centering
-    \includegraphics[width=\textwidth]{./figs/cvae.pdf}%
-    \caption{\Gls{cvae} architecture with input $x$, labels $\ell$, and latent space $z$.}\label{fig:cvae}%
-  \end{subfigure}%
-  \caption{Diagrams of \gls{ml} algorithm architectures.}
-\end{figure}%
-
 Although a conditional \gls{gan} using the infoGAN network
 architecture~\cite{Chen2016a} was evaluated for this work, it did not
 perform as well as the \gls{cvae} because of difficulties related to the
@@ -844,26 +705,6 @@ accurate models.  From these results, accurate predictions can be
 expected for $J(P||P_m) < 0.3$, whereas predictions with
 $J(P||P_m) > 0.6$ exhibit incorrect median values and overall shapes.
 
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=3,width=0.48\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figs/pdfs_50429.pdf}\hfill%
-    \includegraphics[page=4,width=0.48\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figs/pdfs_50429.pdf}%
-    \caption{$J(P||P_{\beta})=0$.}\label{fig:}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=3,width=0.48\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figs/pdfs_44209.pdf}\hfill%
-    \includegraphics[page=4,width=0.48\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figs/pdfs_44209.pdf}%
-    \caption{$J(P||P_{\beta})=\nicefrac{\ln{(2)}}{2}$.}\label{fig:pdfs_hilo_2}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=3,width=0.48\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figs/pdfs_14523.pdf}\hfill%
-    \includegraphics[page=4,width=0.48\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figs/pdfs_14523.pdf}%
-    \caption{$J(P||P_{\beta})=0.59$.}\label{fig:}%
-  \end{subfigure}%
-  \caption{Marginal \glspl{fdf} for low, mid-range, and high Jensen-Shannon divergence values for the $\beta$-$\beta$ \gls{pdf} model. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:pdfs_hilo}%
-\end{figure}%
-
 The second metric of interest characterizes the error in predicting
 $\wt{\dot{\omega}}$ and is simply the normalized \gls{rmse} of the model predictions, $\wt{\dot{\omega}}_m$:
 \begin{align}
@@ -917,19 +758,6 @@ models, Table\,\ref{tab:summary}. This indicates that the more complex
 \gls{ml} models are capturing important complex physical effects that
 the OLS approach misses.
 
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/jsd_dice_0004.pdf}%
-    \caption{\Gls{fdf} of $J$.}\label{fig:jsd_pdf}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=2,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/jsd_dice_0004.pdf}%
-    \caption{Cumulative density function of $J$.}\label{fig:jsd_cdf}%
-  \end{subfigure}%
-  \caption{\Gls{fdf} predictions on validation data. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model.}\label{fig:jsd}%
-\end{figure}%
-
 Model prediction times for each \gls{fdf} were computed for all
 models as:
 \begin{align}
@@ -953,22 +781,6 @@ in both $Z$ and $c$ and an outer product to compute the
 \gls{fpdf}, leading to prediction times comparable with the random
 forests model. The $\beta$ \gls{pdf} was computed through the SciPy
 library~\cite{Jones2001}.
-
-\begin{table}[!tbp]
-  \centering
-  \begin{tabular}{lccccccc}
-    \toprule
-    Model & $J^t_{90}$ & $J^v_{90}$ & $t_m\,(\unit{ms})$ & \gls{rmse}$(\wt{\dot{\omega}})$& $R^2(\wt{\dot{\omega}})$ & \gls{dof} (million)& Memory (MB)\\
-    \midrule
-    RF            & 0.03 & 0.12 & 0.932 & 0.22 & 0.97 & 5.2 & 82107 \\
-    \gls{dnn}     & 0.11 & 0.11 & 0.036 & 0.23 & 0.97 & 1.1 & 27 \\
-    \gls{cvae}    & 0.11 & 0.12 & 0.038 & 0.22 & 0.97 & 2.3 & 36 \\
-    $\beta$-$\beta$ & 0.35 & 0.35 & 1.178 & 0.63 & 0.75 & {--} & {--} \\
-    \gls{ols}     & 0.43 & 0.43 & 0.018 & 0.69 & 0.70 & 0.008 & 0.1 \\
-    \bottomrule
-  \end{tabular}
-  \caption{Summary of model performance and size for $P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})$ and $\wt{\dot{\omega}}$.}\label{tab:summary}
-\end{table}
 
 The \gls{fdf} models were used to provide predictions of the reaction
 rate, $\wt{\dot{\omega}}$, by convoluting the predicted \gls{fdf} with
@@ -994,31 +806,8 @@ Figure\,\ref{fig:convolution_scatter}. The \gls{ols} model presents an
 error that is three times larger than the other \gls{ml} models and is
 slightly larger than the error of the $\beta$-$\beta$ model.
 
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_dice_0004.pdf}%
-    \caption{$\wt{\dot{\omega}}$ predictions.}\label{fig:convolution_scatter}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=2,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_dice_0004.pdf}%
-    \caption{\gls{pdf} of $\epsilon(\wt{\dot{\omega}})$.}\label{fig:convolution_pdf}%
-  \end{subfigure}%
-  \caption{Reaction rate predictions. Red squares and solid: RF; green diamonds and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange pentagons and short dashed: $\beta$-$\beta$ model.}\label{fig:convolution}%
-\end{figure}%
-
 
 \subsection{Model generalization}\label{sec:predictions_all}
-
-\begin{figure}[!tbp]%
-  \centering%
-  \includegraphics[page=4,width=0.6\textwidth]{./figs/pdf_distances.pdf}\\%
-  \caption{The $90^{\text{th}}$ percentile of $r_{i,j}$ as a function
-    of height. Red squares and solid: $r_{3,j}$ for $j=1,\dots,n_v$;
-    green diamonds and dashed: $r_{5,j}$ for $j=1,\dots,n_v$; blue
-    circles and dash-dotted: $r_{i,j}$ for $i=[1,3,5,7,9]$ and
-    $j=2,4,6,\,\text{and}\ 8$.}\label{fig:r90}%
-\end{figure}%
 
 In this section, we examine the performance of the models trained
 using different data sets and their ability to generalize to data from
@@ -1138,91 +927,6 @@ simulation, without adversely affecting the simulation time because
 the most accurate models were trained using data from less than $4\%$
 of the total \gls{dns} domain volume.
 
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=1,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/dice_predictions_0004.pdf}\hfill%
-    \includegraphics[page=2,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/dice_predictions_0004.pdf}%
-    \caption{$\mathcal{D}_3^t$ ($z_3=0.0775\,\unit{m}$).}\label{fig:gen_3}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=1,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/dice_predictions_0006.pdf}\hfill%
-    \includegraphics[page=2,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/dice_predictions_0006.pdf}%
-    \caption{$\mathcal{D}_5^t$ ($z_5=0.1025\,\unit{m}$).}\label{fig:gen_5}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=1,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/dice_predictions_skip.pdf}\hfill%
-    \includegraphics[page=2,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/dice_predictions_skip.pdf}%
-    \caption{$\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$.}\label{fig:gen_skip}%
-  \end{subfigure}%
-  \caption{$J_{90}$ and \gls{rmse}$(\wt{\dot{\omega}})$ as a function of
-    height using \gls{ml} algorithms trained with data from different
-    sections of the flame. Red squares and solid: RF; green diamonds
-    and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange
-    pentagons and short dashed: $\beta$-$\beta$ model.}\label{fig:gen}%
-\end{figure}%
-
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.3cm 1.3cm, clip=true]{./figs/convolution_skip.pdf}%
-    \caption{$\wt{\dot{\omega}}$ predictions.}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=3,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_skip.pdf}%
-    \caption{\mbox{Conditional means of $\wt{\dot{\omega}}$ as a function of $\wt{z}$.}}%
-  \end{subfigure}\\[0.2cm]%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=4,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/convolution_skip.pdf}%
-    \caption{\mbox{Conditional means of $\wt{\dot{\omega}}$ as a function of $\wt{c}$.}}%
-  \end{subfigure}%
-  \caption{Reaction rate predictions for models trained on $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$. Red squares and solid: RF; green diamonds and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange pentagons and short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:convolution_skip}%
-\end{figure}%
-
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=3,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/pdfs_66089.pdf}\hfill%
-    \includegraphics[page=4,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/pdfs_66089.pdf}%
-    \caption{$J(P||P_{\text{\gls{dnn}}})=0.05$.}\label{fig:}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=3,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/pdfs_159948.pdf}\hfill%
-    \includegraphics[page=4,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/pdfs_159948.pdf}%
-    \caption{$J(P||P_{\text{\gls{dnn}}})=0.1$.}\label{fig:}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{\textwidth}%
-    \includegraphics[page=3,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/pdfs_182976.pdf}\hfill%
-    \includegraphics[page=4,width=0.48\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figs/pdfs_182976.pdf}%
-    \caption{$J(P||P_{\text{\gls{dnn}}})=0.21$.}\label{fig:pdfs_skip_3}%
-  \end{subfigure}%
-  \caption{Marginal \glspl{fdf} for median and high Jensen-Shannon divergence values for models trained on $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:pdfs_skip}%
-\end{figure}%
-
-
-\begin{figure}[!tbp]%
-  \centering%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.3cm 1.3cm, clip=true]{./figs/dice_predictions_comp_1030.pdf}%
-    \caption{$J_{90}$.}%
-  \end{subfigure}\hfill%
-  \begin{subfigure}[t]{0.48\textwidth}%
-    \includegraphics[page=2,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figs/dice_predictions_comp_1030.pdf}%
-    \caption{\gls{rmse}$(\wt{\dot{\omega}})$.}%
-  \end{subfigure}%
-  \caption{$J_{90}$ and \gls{rmse}$(\wt{\dot{\omega}})$ as a function
-    of height using the \gls{dnn} model trained at
-    $t=0.0626\,\unit{s}$ on
-    $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$
-    and the $\beta$-$\beta$ model. Red squares and solid: \gls{dnn} at
-    $t=0.0626\,\unit{s}$; green diamonds and dashed: \gls{dnn} at
-    $t=0.059\,\unit{s}$; blue circles and dash-dotted:
-    $\beta$-$\beta$ model at $t=0.0626\,\unit{s}$; orange pentagons
-    and short dashed: $\beta$-$\beta$ model at
-    $t=0.059\,\unit{s}$.}\label{fig:prediction_comp_1030}%
-\end{figure}%
-
-
 \section{Conclusion}\label{sec:ccl}
 
 In this work, we used three different \gls{ml} algorithms
@@ -1326,4 +1030,279 @@ The \gls{cvae} decoder architecture is:
 \end{enumerate}
 Additional \gls{cvae} hyperparameters are: the learning rate
 ($10^{-3}$), the number of epochs (500), the batch size (64).
+
+% Figures
+\clearpage\newpage
+\renewcommand\thefigure{\arabic{figure}}
+\renewcommand\thetable{\arabic{table}}
+\begin{figure}[!tbp]%
+  \centering%
+  \includegraphics[width=0.5\textwidth]{./figure01.pdf}%
+  \caption{Lifted flame of the low-swirl burner from the experimental configuration. From \citet{Day2012}. \copyright{} Elsevier. Reproduced with permission.}\label{fig:exp_lsb}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figure02a.pdf}%
+    \caption{$x=0\,\unit{m}$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figure02b.pdf}%
+    \caption{$z=0.0525\,\unit{m}$ (center height of $\mathcal{V}_{1}$).}%
+  \end{subfigure}\\%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figure02c.pdf}%
+    \caption{$z=0.0775\,\unit{m}$ (center height of $\mathcal{V}_{3}$).}%
+ \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figure02d.pdf}%
+    \caption{$z=0.1025\,\unit{m}$ (center height of $\mathcal{V}_{5}$).}%
+  \end{subfigure}\\%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figure02e.pdf}%
+    \caption{$z=0.1275\,\unit{m}$ (center height of $\mathcal{V}_{7}$).}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim = 1.2cm 0cm 0.4cm 0cm, clip=true]{./figure02f.pdf}%
+    \caption{$z=0.14\,\unit{m}$ (center height of $\mathcal{V}_{9}$).}%
+  \end{subfigure}
+  \caption{Slices of $\dot{\omega}$ in \gls{dns}. White dashed lines: $z$ locations of slices shown in (b)--(f).}\label{fig:dns}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.4cm 0cm 1.4cm 0cm, clip=true]{./figure03a.pdf}%
+    \caption{$\wt{Z}$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.4cm 0cm 1.4cm 0cm, clip=true]{./figure03b.pdf}%
+    \caption{$\wt{Z''}$.}%
+  \end{subfigure}\\%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.4cm 0cm 1.4cm 0cm, clip=true]{./figure03c.pdf}%
+    \caption{$\wt{c}$.}%
+ \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.4cm 0cm 1.4cm 0cm, clip=true]{./figure03d.pdf}%
+    \caption{$\wt{c''}$.}%
+  \end{subfigure}
+  % \\%
+  % \begin{subfigure}[t]{0.48\textwidth}%
+  %   \includegraphics[page=5,width=\textwidth]{./dice_0004_slice.pdf}%
+  %   \caption{$\wt{\dot{\omega}}$.}%
+  % \end{subfigure}
+  \caption{Slices of filtered \gls{dns} data at $z=0.0775\,\unit{m}$ (center height of $\mathcal{V}_3$).}\label{fig:slices}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.1cm, clip=true]{./figure04a.pdf}%
+    \caption{Marginal $P(Z,c)$ as a function of $Z$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.1cm, clip=true]{./figure04b.pdf}%
+    \caption{Marginal $P(Z,c)$ as a function of $c$.}%
+  \end{subfigure}\\%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.1cm, clip=true]{./figure04c.pdf}%
+    \caption{Marginal conditional means of $\dot{\omega}$ as a function of $Z$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.1cm, clip=true]{./figure04d.pdf}%
+    \caption{Marginal conditional means of $\dot{\omega}$ as a function of $c$.}%
+  \end{subfigure}%
+  \caption{Examples of $P(Z,c)$ and $\langle \dot{\omega} | Z, c \rangle$ for increasing $\wt{\dot{\omega}}$. Red solid: $\wt{\dot{\omega}} = 0$ ($\wt{Z} = 0$, $\wt{Z''} = 0$, $\wt{c} = 0$, $\wt{c''} = 0$); green dashed: $\wt{\dot{\omega}} = 0.03$ ($\wt{Z}  =0.4$, $\wt{Z''}=0.006$, $\wt{c}  =0.03$, $\wt{c''}=0.0006$); blue dash-dotted: $\wt{\dot{\omega}} = 7.4$ ($\wt{Z}  =0.7$, $\wt{Z''}=0.01$, $\wt{c}  =0.08$, $\wt{c''}=0.003$); orange short dashed: $\wt{\dot{\omega}} = 42.2$ ($\wt{Z}  =0.9$, $\wt{Z''}=0.003$, $\wt{c}  =0.12$, $\wt{c''}=0.005$).}\label{fig:pdfs}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \includegraphics[page=1, height=0.49\textwidth, trim=0.0cm 0cm 0.cm 0cm, clip]{./figure05.pdf}%
+  \caption{Scatter plots of moments $\wt{Z}$ and $\wt{c}$ for samples in $\mathcal{V}_3$ (centered at $z=0.0775\,\unit{m}$) colored by $\wt{Z''}$ (left) and $\wt{c''}$ (right) with associated marginal distributions.}\label{fig:inputs}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \includegraphics[width=0.9\textwidth]{./figure06.pdf}\\%
+  \caption{Illustration of data generation procedure for $\mathcal{V}_5$.}\label{fig:gen_data}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \centering
+    \includegraphics[width=0.85\textwidth]{./figure07a.pdf}%
+    \caption{Decision tree with a tree depth of 3. Green boxes: decision nodes with conditions on the input variables; blue boxes: leaves with output values.}\label{fig:rf}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \centering
+    \includegraphics[width=\textwidth]{./figure07b.pdf}%
+    \caption{\Gls{cvae} architecture with input $x$, labels $\ell$, and latent space $z$.}\label{fig:cvae}%
+  \end{subfigure}%
+  \caption{Diagrams of \gls{ml} algorithm architectures.}
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figure08a.pdf}%
+    \caption{$J(P||P_{\beta})=0$.}\label{fig:}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figure08b.pdf}%
+    \caption{$J(P||P_{\beta})=\nicefrac{\ln{(2)}}{2}$.}\label{fig:pdfs_hilo_2}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1.5cm 1.3cm, clip=true]{./figure08c.pdf}%
+    \caption{$J(P||P_{\beta})=0.59$.}\label{fig:}%
+  \end{subfigure}%
+  \caption{Marginal \glspl{fdf} for low, mid-range, and high Jensen-Shannon divergence values for the $\beta$-$\beta$ \gls{pdf} model. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:pdfs_hilo}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figure09a.pdf}%
+    \caption{\Gls{fdf} of $J$.}\label{fig:jsd_pdf}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figure09b.pdf}%
+    \caption{Cumulative density function of $J$.}\label{fig:jsd_cdf}%
+  \end{subfigure}%
+  \caption{\Gls{fdf} predictions on validation data. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model.}\label{fig:jsd}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{table}[!tbp]
+  \centering
+  \begin{tabular}{lccccccc}
+    \toprule
+    Model & $J^t_{90}$ & $J^v_{90}$ & $t_m\,(\unit{ms})$ & \gls{rmse}$(\wt{\dot{\omega}})$& $R^2(\wt{\dot{\omega}})$ & \gls{dof} (million)& Memory (MB)\\
+    \midrule
+    RF            & 0.03 & 0.12 & 0.932 & 0.22 & 0.97 & 5.2 & 82107 \\
+    \gls{dnn}     & 0.11 & 0.11 & 0.036 & 0.23 & 0.97 & 1.1 & 27 \\
+    \gls{cvae}    & 0.11 & 0.12 & 0.038 & 0.22 & 0.97 & 2.3 & 36 \\
+    $\beta$-$\beta$ & 0.35 & 0.35 & 1.178 & 0.63 & 0.75 & {--} & {--} \\
+    \gls{ols}     & 0.43 & 0.43 & 0.018 & 0.69 & 0.70 & 0.008 & 0.1 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Summary of model performance and size for $P(Z,c | \wt{Z}, \wt{Z''}, \wt{c}, \wt{c''})$ and $\wt{\dot{\omega}}$.}\label{tab:summary}
+\end{table}
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figure10a.pdf}%
+    \caption{$\wt{\dot{\omega}}$ predictions.}\label{fig:convolution_scatter}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figure10b.pdf}%
+    \caption{\gls{pdf} of $\epsilon(\wt{\dot{\omega}})$.}\label{fig:convolution_pdf}%
+  \end{subfigure}%
+  \caption{Reaction rate predictions. Red squares and solid: RF; green diamonds and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange pentagons and short dashed: $\beta$-$\beta$ model.}\label{fig:convolution}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \includegraphics[page=1,width=0.6\textwidth]{./figure11.pdf}\\%
+  \caption{The $90^{\text{th}}$ percentile of $r_{i,j}$ as a function
+    of height. Red squares and solid: $r_{3,j}$ for $j=1,\dots,n_v$;
+    green diamonds and dashed: $r_{5,j}$ for $j=1,\dots,n_v$; blue
+    circles and dash-dotted: $r_{i,j}$ for $i=[1,3,5,7,9]$ and
+    $j=2,4,6,\,\text{and}\ 8$.}\label{fig:r90}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figure12a.pdf}%
+    \caption{$\mathcal{D}_3^t$ ($z_3=0.0775\,\unit{m}$).}\label{fig:gen_3}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figure12b.pdf}%
+    \caption{$\mathcal{D}_5^t$ ($z_5=0.1025\,\unit{m}$).}\label{fig:gen_5}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figure12c.pdf}%
+    \caption{$\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$.}\label{fig:gen_skip}%
+  \end{subfigure}%
+  \caption{$J_{90}$ and \gls{rmse}$(\wt{\dot{\omega}})$ as a function of
+    height using \gls{ml} algorithms trained with data from different
+    sections of the flame. Red squares and solid: RF; green diamonds
+    and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange
+    pentagons and short dashed: $\beta$-$\beta$ model.}\label{fig:gen}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.3cm 1.3cm, clip=true]{./figure13a.pdf}%
+    \caption{$\wt{\dot{\omega}}$ predictions.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figure13b.pdf}%
+    \caption{\mbox{Conditional means of $\wt{\dot{\omega}}$ as a function of $\wt{z}$.}}%
+  \end{subfigure}\\[0.2cm]%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figure13c.pdf}%
+    \caption{\mbox{Conditional means of $\wt{\dot{\omega}}$ as a function of $\wt{c}$.}}%
+  \end{subfigure}%
+  \caption{Reaction rate predictions for models trained on $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$. Red squares and solid: RF; green diamonds and dashed: \gls{dnn}; blue circles and dash-dotted: \gls{cvae}; orange pentagons and short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:convolution_skip}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figure14a.pdf}%
+    \caption{$J(P||P_{\text{\gls{dnn}}})=0.05$.}\label{fig:}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figure14b.pdf}%
+    \caption{$J(P||P_{\text{\gls{dnn}}})=0.1$.}\label{fig:}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.2cm 0cm 1cm 1cm, clip=true]{./figure14c.pdf}%
+    \caption{$J(P||P_{\text{\gls{dnn}}})=0.21$.}\label{fig:pdfs_skip_3}%
+  \end{subfigure}%
+  \caption{Marginal \glspl{fdf} for median and high Jensen-Shannon divergence values for models trained on $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$. Red solid: RF; green dashed: \gls{dnn}; blue dash-dotted: \gls{cvae}; orange short dashed: $\beta$-$\beta$ model; black solid: \gls{dns}.}\label{fig:pdfs_skip}%
+\end{figure}%
+
+\clearpage\newpage
+\begin{figure}[!tbp]%
+  \centering%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.3cm 1.3cm, clip=true]{./figure15a.pdf}%
+    \caption{$J_{90}$.}%
+  \end{subfigure}\hfill%
+  \begin{subfigure}[t]{0.48\textwidth}%
+    \includegraphics[page=1,width=\textwidth, trim=0.5cm 0cm 1.5cm 1.3cm, clip=true]{./figure15b.pdf}%
+    \caption{\gls{rmse}$(\wt{\dot{\omega}})$.}%
+  \end{subfigure}%
+  \caption{$J_{90}$ and \gls{rmse}$(\wt{\dot{\omega}})$ as a function
+    of height using the \gls{dnn} model trained at
+    $t=0.0626\,\unit{s}$ on
+    $\mathcal{D}^t = \bigcup\limits_{i=1, 3, 5, 7, 9} \mathcal{D}_i^t$
+    and the $\beta$-$\beta$ model. Red squares and solid: \gls{dnn} at
+    $t=0.0626\,\unit{s}$; green diamonds and dashed: \gls{dnn} at
+    $t=0.059\,\unit{s}$; blue circles and dash-dotted:
+    $\beta$-$\beta$ model at $t=0.0626\,\unit{s}$; orange pentagons
+    and short dashed: $\beta$-$\beta$ model at
+    $t=0.059\,\unit{s}$.}\label{fig:prediction_comp_1030}%
+\end{figure}%
+
 \end{document}
