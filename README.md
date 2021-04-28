@@ -15,11 +15,14 @@ $ pipenv install
 
 ## Citation
 ```
-@article{Henrydefrahan2018,
-    author    = {Henry de Frahan, M. T. and Yellapantula, S. and King, R. and Day, M. and Grout, R.},
-    title     = {Deep learning for presumed probability density function models},
-    journal   = {arXiv:1901.05557},
-    year      = {2019}
+@article{Henrydefrahan2019,
+  title={Deep learning for presumed probability density function models},
+  author={Henry de Frahan, Marc T and Yellapantula, Shashank and King, Ryan and Day, Marc S and Grout, Ray W},
+  journal={Combustion and Flame},
+  volume={208},
+  pages={436--450},
+  year={2019},
+  publisher={Elsevier}
 }
 ```
 
